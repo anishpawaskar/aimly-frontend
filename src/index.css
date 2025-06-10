@@ -1,1 +1,76 @@
 @import "tailwindcss";
+
+@custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
+
+:root {
+  --foreground-color: #191919;
+  --primary-foreground-color: #fff;
+  --primary-color: #4772fa;
+  --primary-color-hover: #6c8efb;
+  --primary-color-active: #3e60cd;
+  --primary-disable-color: #b5c7fd;
+  --cancel-hover-color: #f4f4f4;
+  --cancel-active-color: #f4f4f4;
+  --cancel-disable-color: rgba(var(--foreground-color), 0.2);
+  --default-shadow: 0px 5px 18px 0px rgba(0, 0, 0, 0.2);
+  --main-background-color: #fff;
+}
+
+@theme {
+  --color-primary: rgb(71, 114, 250);
+  --color-primary-foreground: rgb(255, 255, 255);
+  --color-gray: rgb(25, 25, 25);
+  --color-main-background: rgb(255, 255, 255);
+  --color-primary-font: rgb(0, 0, 0);
+  --color-card-bg: rgb(250, 250, 250);
+  --color-card-dark-bg: rgb(30, 30, 30);
+  --color-priority-low: rgb(71, 114, 250);
+  --color-priority-medium: rgb(250, 168, 12);
+  --color-priority-high: rgb(225, 62, 57);
+  --color-wran-red: rgb(224, 49, 49);
+  --color-cancel-btn-hover: rgb(244, 244, 244);
+  --color-cancel-btn-active: rgb(232, 232, 232);
+  --color-btn-active-color: rgb(62, 96, 205);
+  --color-btn-hover-color: rgb(108, 142, 251);
+  --color-btn-disable-color: rgb(181, 199, 253);
+  --shadow-default-app: var(--default-shadow);
+}
+
+@layer base {
+  button:not(:disabled),
+  [role="button"]:not(:disabled) {
+    cursor: pointer;
+  }
+
+  button:disabled,
+  [role="button"][aria-disabled="true"] {
+    cursor: not-allowed;
+  }
+
+  /* my own theme */
+  [data-theme="blue"] {
+    --color-primary: rgb(71, 114, 250);
+    --color-tasks-nav-from-color: rgb(71, 115, 250);
+    --color-tasks-nav-to-color: rgb(109, 145, 255);
+    --color-btn-active-color: rgb(62, 96, 205);
+    --color-btn-hover-color: rgb(108, 142, 251);
+    --color-btn-disable-color: rgb(181, 199, 253);
+  }
+
+  [data-theme="turquoise"] {
+    --color-primary: #1dc19d;
+    --color-tasks-nav-from-color: rgb(30, 188, 153);
+    --color-tasks-nav-to-color: rgb(85, 211, 183);
+    --color-btn-active-color: rgb(28, 159, 131);
+    --color-btn-hover-color: rgb(74, 205, 177);
+    --color-btn-disable-color: rgb(165, 230, 216);
+  }
+}
+
+@utility background-gradient-tasks-nav {
+  background-image: linear-gradient(
+    180deg,
+    var(--color-tasks-nav-from-color),
+    var(--color-tasks-nav-to-color)
+  );
+}
