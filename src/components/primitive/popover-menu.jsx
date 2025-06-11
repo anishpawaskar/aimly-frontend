@@ -1,26 +1,19 @@
 import { cn } from "@/lib/utils";
 import { createContext, useContext, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { Button } from "./button";
+import { buttonVariants } from "./button";
 import { Slot } from "./slot";
 
 const PopoverMenuContext = createContext(null);
 
 const usePopoverMenu = () => useContext(PopoverMenuContext);
 
-const PopoverMenu = ({ open, onOpenChange, defaultOpen, children }) => {
-  const [isOpen, setIsOpen] = useState(false);
+// NOTE: as of now component is being controlled from outside state figure out how to make it uncontrollable
+const PopoverMenu = ({ open, onOpenChange, children }) => {
   const [contentStyles, setContentStyles] = useState({
     opacity: "0",
     visibility: "hidden",
   });
-
-  const prevRefValue = useRef(isOpen);
-
-  useEffect(() => {
-    console.log("Prev ref value", prevRefValue.current);
-    console.log("isOpen value", isOpen);
-  }, [isOpen, prevRefValue]);
 
   const refs = {
     triggerRef: useRef(null),
@@ -28,8 +21,8 @@ const PopoverMenu = ({ open, onOpenChange, defaultOpen, children }) => {
   };
 
   const contextValue = {
-    isOpen,
-    setIsOpen,
+    isOpen: open,
+    setIsOpen: onOpenChange,
     refs,
     contentStyles,
     setContentStyles,
@@ -158,30 +151,36 @@ const PopoverMenuFooter = ({ className, children, ...props }) => {
 
 const PopoverMenuCancel = ({ className, asChild = false, ...props }) => {
   const { setIsOpen } = usePopoverMenu();
-  const Comp = asChild ? Slot : Button;
+  const Comp = asChild ? Slot : "button";
 
   return (
     <Comp
-      variant={"outlineGhost"}
-      className={className}
+      className={cn(
+        buttonVariants({ variant: "outlineGhost", isDisabled: false }),
+        className
+      )}
       onClick={() => setIsOpen(false)}
       {...props}
     />
   );
 };
 
-const PopoverMenuAction = ({ className, children, ...props }) => {
+const PopoverMenuAction = ({ className, asChild = false, ...props }) => {
   const { setIsOpen } = usePopoverMenu();
+  const Comp = asChild ? Slot : "button";
 
   return (
-    <Button
-      variant={"primary"}
-      className={className}
+    <Comp
+      className={cn(
+        buttonVariants({
+          variant: "primary",
+          isDisabled: props?.isDisabled ? true : false,
+        }),
+        className
+      )}
       onClick={() => setIsOpen(false)}
       {...props}
-    >
-      {children}
-    </Button>
+    />
   );
 };
 
