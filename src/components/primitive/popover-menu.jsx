@@ -182,6 +182,11 @@ const PopoverMenuContent = ({
         transform: `translate(${x}px, ${y}px)`,
         alignItem: align,
       }));
+    } else {
+      setContentStyles({
+        opacity: "0",
+        visibility: "hidden",
+      });
     }
   }, [isOpen]);
 
