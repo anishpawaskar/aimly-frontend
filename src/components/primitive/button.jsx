@@ -11,6 +11,7 @@ const buttonVariants = cva(
         primary: "bg-primary text-primary-foreground",
         outlinePrimary: "border border-primary text-primary-foreground",
         outlineGhost: "border border-gray/10 text-gray/60",
+        ghost: "text-gray/60",
       },
       size: {
         default: "h-10 px-4",
@@ -60,6 +61,11 @@ const buttonVariants = cva(
         variant: "outlinePrimary",
         isDisabled: true,
         class: "disabled:bg-btn-disable-color",
+      },
+      {
+        variant: "ghost",
+        isDisabled: false,
+        class: "hover:bg-cancel-btn-hover active:bg-cancel-btn-active",
       },
     ],
     defaultVariants: {
