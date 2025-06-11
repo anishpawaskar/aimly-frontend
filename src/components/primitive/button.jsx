@@ -87,4 +87,4 @@ const Button = ({ size, variant, className, asChild = false, ...props }) => {
   );
 };
 
-export { Button };
+export { Button, buttonVariants };
