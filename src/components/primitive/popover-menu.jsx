@@ -1,5 +1,12 @@
 import { cn } from "@/lib/utils";
-import { createContext, useContext, useEffect, useRef, useState } from "react";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 import { createPortal } from "react-dom";
 import { buttonVariants } from "./button";
 import { Slot } from "./slot";
@@ -90,12 +97,15 @@ const PopoverMenuContent = ({
     };
   }, [triggerRef, contentRef]);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (isOpen && contentRef.current) {
       const triggerRect = triggerRef.current.getBoundingClientRect();
       const contentRect = contentRef.current.getBoundingClientRect();
       const windowWidth = window.innerWidth;
       const windowHeight = window.innerHeight;
+
+      console.log("trigger rect", triggerRect);
+      console.log("content rect", contentRect);
 
       let x; // horizontal
       let y; // vertical
@@ -105,7 +115,63 @@ const PopoverMenuContent = ({
           const triggerMiddleX = triggerRect.right - triggerRect.width / 2;
           x = triggerMiddleX - contentRect.width / 2;
 
-          y = triggerRect.bottom + sideOffset;
+          const potentialY = triggerRect.bottom + sideOffset;
+          const isOverflowingBottom =
+            potentialY + contentRect.height > windowHeight;
+
+          if (isOverflowingBottom) {
+            y = triggerRect.top - contentRect.height - sideOffset;
+          } else {
+            y = potentialY;
+          }
+          break;
+        }
+
+        case "top": {
+          const triggerMiddleX = triggerRect.right - triggerRect.width / 2;
+          x = triggerMiddleX - contentRect.width / 2;
+
+          const potentialY = triggerRect.top - contentRect.height - sideOffset;
+          const isOverflowingTop = potentialY < 0;
+
+          if (isOverflowingTop) {
+            y = triggerRect.bottom + sideOffset;
+          } else {
+            y = potentialY;
+          }
+
+          break;
+        }
+
+        case "right": {
+          const triggerMiddleY = triggerRect.top + triggerRect.height / 2;
+          y = triggerMiddleY - contentRect.height / 2;
+
+          const potentialX = triggerRect.right + sideOffset;
+          const isOverflowingRight =
+            potentialX + contentRect.width > windowWidth;
+
+          if (isOverflowingRight) {
+            x = triggerRect.left - contentRect.width - sideOffset;
+          } else {
+            x = potentialX;
+          }
+          break;
+        }
+
+        case "left": {
+          const triggerMiddleY = triggerRect.top + triggerRect.height / 2;
+          y = triggerMiddleY - contentRect.height / 2;
+
+          const potentialX = triggerRect.left - contentRect.width - sideOffset;
+          const isOverflowingLeft = potentialX < 0;
+
+          if (isOverflowingLeft) {
+            x = triggerRect.right + sideOffset;
+          } else {
+            x = potentialX;
+          }
+          break;
         }
       }
 
@@ -128,7 +194,7 @@ const PopoverMenuContent = ({
       ref={contentRef}
       style={contentStyles}
       className={cn(
-        "fixed top-0 left-0 rounded-md p-3 min-w-52 shadow-default-app flex flex-col gap-4",
+        "fixed top-0 left-0 z-30 bg-card-bg rounded-md p-3 min-w-52 shadow-default-app flex flex-col gap-4",
         className
       )}
     >
