@@ -16,7 +16,10 @@ export const AuthForm = ({
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [isPasswordFocus, setIsPasswordFocus] = useState(false);
 
+  console.log("auth typee", authType);
+
   const isSignInForm = authType === "signIn";
+  console.log("is signin form", isSignInForm);
   const authRedirectText = isSignInForm
     ? "Don't have an account?"
     : "Already have an account?";
@@ -24,6 +27,8 @@ export const AuthForm = ({
     ? "Password"
     : "Password: 8-30 characters";
   const authRedirectRoute = isSignInForm ? "/signup" : "/signin";
+  const authRedirectName = isSignInForm ? "Sign Up" : "Sign In";
+  console.log("redirect", authRedirectRoute);
 
   const forgotPasswordValues = {
     pathname: "/requestRestPassword",
@@ -108,10 +113,10 @@ export const AuthForm = ({
       <div className="flex justify-center items-center gap-1 flex-wrap text-sm">
         <span className="text-frontColor opacity-60">{authRedirectText}</span>
         <Link
-          href={authRedirectRoute}
+          to={authRedirectRoute}
           className="text-[var(--primary-color)] hover:underline decoration-1"
         >
-          {heading}
+          {authRedirectName}
         </Link>
       </div>
     </div>
