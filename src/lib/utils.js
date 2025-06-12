@@ -23,3 +23,22 @@ export const clampY = (y, contentHeight) => {
     windowHeight - contentHeight - GAP_BETWEEN_SCREEN
   );
 };
+
+export const validateInputs = (values, defaultErrors) => {
+  const errors = {};
+
+  for (const key in values) {
+    if (values[key]) {
+      errors[key] = "";
+    } else {
+      errors[key] = defaultErrors[key];
+    }
+  }
+
+  return errors;
+};
+
+export const isValidEmail = (email) => {
+  const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
+  return emailRegex.test(email);
+};
