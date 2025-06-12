@@ -7,7 +7,8 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        default: "bg-[var(--parimary-color)] text-[--primary-foreground-color]",
+        default:
+          "bg-[var(--primary-color)] text-[var(--primary-foreground-color)]",
         primary: "bg-primary text-primary-foreground",
         outlinePrimary: "border border-primary text-primary-foreground",
         outlineGhost: "border border-gray/10 text-gray/60",
