@@ -34,6 +34,7 @@
   --color-btn-hover-color: rgb(108, 142, 251);
   --color-btn-disable-color: rgb(181, 199, 253);
   --shadow-default-app: var(--default-shadow);
+  --color-auth-bg: rgb(249, 249, 249);
 }
 
 @layer base {
