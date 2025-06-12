@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { Input } from "../primitive/input";
 import { IconButton } from "../primitive/icon-button";
 import { Eye, EyeOff } from "lucide-react";
