@@ -16,10 +16,7 @@ export const AuthForm = ({
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [isPasswordFocus, setIsPasswordFocus] = useState(false);
 
-  console.log("auth typee", authType);
-
   const isSignInForm = authType === "signIn";
-  console.log("is signin form", isSignInForm);
   const authRedirectText = isSignInForm
     ? "Don't have an account?"
     : "Already have an account?";
@@ -28,7 +25,6 @@ export const AuthForm = ({
     : "Password: 8-30 characters";
   const authRedirectRoute = isSignInForm ? "/signup" : "/signin";
   const authRedirectName = isSignInForm ? "Sign Up" : "Sign In";
-  console.log("redirect", authRedirectRoute);
 
   const forgotPasswordValues = {
     pathname: "/requestRestPassword",
@@ -41,9 +37,10 @@ export const AuthForm = ({
   return (
     <div
       // TODO: fix shadow later
-      className={`auth-form w-96 p-11 rounded-xl flex flex-col gap-5 sm:bg-white sm:shadow-default-app ${
-        isSignInForm ? "min-h-[24rem]" : "min-h-[21rem]"
-      } absolute top-[10%] left-1/2 -translate-x-1/2`}
+      // TODO: once reset password page is completed using this height ${
+      // isSignInForm ? "min-h-[24rem]" : "min-h-[21rem]"
+      // }
+      className={`auth-form w-96 p-11 rounded-xl flex flex-col gap-5 sm:bg-white sm:shadow-default-app min-h-[21rem] absolute top-[10%] left-1/2 -translate-x-1/2`}
     >
       <h3 className="head3 text-[26px] leading-8 text-frontColor font-semibold">
         {heading}
@@ -99,7 +96,7 @@ export const AuthForm = ({
         </div>
         <Button size={"full"}>{heading}</Button>
       </form>
-      {isSignInForm && (
+      {/* {isSignInForm && (
         <div className="flex justify-center items-center">
           <Link
             to={forgotPasswordValues}
@@ -108,7 +105,7 @@ export const AuthForm = ({
             Forgot Password
           </Link>
         </div>
-      )}
+      )} */}
 
       <div className="flex justify-center items-center gap-1 flex-wrap text-sm">
         <span className="text-frontColor opacity-60">{authRedirectText}</span>
