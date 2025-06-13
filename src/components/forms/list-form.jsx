@@ -65,6 +65,18 @@ const ListForm = ({ onOpenChange }) => {
     onOpenChange(false);
   };
 
+  const handleCancel = () => {
+    setFormData({
+      name: "",
+      color: "",
+      viewType: "list",
+    });
+    setValidationError({
+      serverError: "",
+    });
+    onOpenChange(false);
+  };
+
   return (
     <AlertDialogContent>
       <AlertDialogTitle>Add List</AlertDialogTitle>
@@ -149,7 +161,11 @@ const ListForm = ({ onOpenChange }) => {
         {validationError.serverError && <p>{validationError.serverError}</p>}
       </div>
       <AlertDialogFooter className={"mt-8"}>
-        <AlertDialogCancel>Cancel</AlertDialogCancel>
+        <AlertDialogCancel asChild>
+          <Button variant={"outlineGhost"} onClick={handleCancel}>
+            Cancel
+          </Button>
+        </AlertDialogCancel>
         <AlertDialogAction asChild>
           <Button
             variant={"primary"}
