@@ -1,10 +1,9 @@
 import { NavLink } from "react-router";
-import { SMART_LIST } from "./tasks.constant";
-import { Button } from "../primitive/button";
+import { SIDENAV_ACCORDION_ITEMS, SMART_LIST } from "./tasks.constant";
 import { cn } from "@/lib/utils";
 import { useTheme } from "@/context/theme-provider";
 import { Accordion } from "../primitive/accordion";
-import { ProjectsAccordionItem } from "./projects-accodion-item";
+import { TasksSidenavAccordionItem } from "./sidenav-accodion-item";
 
 export const TasksSidenav = () => {
   const { theme } = useTheme();
@@ -41,8 +40,10 @@ export const TasksSidenav = () => {
         })}
       </div>
       <hr className="text-gray/10 my-2" />
-      <Accordion className={"p-0"}>
-        <ProjectsAccordionItem />
+      <Accordion type="multiple" className={"p-0"}>
+        {SIDENAV_ACCORDION_ITEMS.map((item) => {
+          return <TasksSidenavAccordionItem key={item.title} item={item} />;
+        })}
       </Accordion>
     </div>
   );
