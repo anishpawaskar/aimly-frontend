@@ -12,7 +12,7 @@ export const TasksSidenav = () => {
   return (
     <div
       className={cn(
-        "h-screen w-[310px] py-3.5 px-3 hidden md:block md:border-r md:border-gray/10",
+        "h-screen w-[310px] py-3.5 px-3 hidden md:block md:border-r md:border-gray/10 overflow-y-auto",
         isLight ? "bg-transparent" : "tasks-nav-gradient-bg"
       )}
     >

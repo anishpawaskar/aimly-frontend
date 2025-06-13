@@ -43,9 +43,12 @@ export const TasksSidenavAccordionItem = ({ item }) => {
         </div>
       </Button>
 
-      <AccordionContent asChild className={"flex flex-col"}>
-        <ul>
-          {[...new Array(5)].fill(5).map((_, idx) => {
+      <AccordionContent asChild>
+        <ul
+          // TODO: figure out way to hide scroll because two two scolls are appearing
+          className="max-h-none"
+        >
+          {[...new Array(20)].fill(5).map((_, idx) => {
             return (
               <NavLink
                 key={idx}
