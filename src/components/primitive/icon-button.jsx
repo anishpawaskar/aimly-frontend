@@ -28,7 +28,7 @@ const iconButtonVariants = cva("flex items-center justify-center rounded-md", {
       variant: "default",
       isDisabled: false,
       class:
-        "hover:bg-[var(--primary-color-hover)] hover:text-[--primary-foreground-color] active:bg-[var(--primary-color-active)] active:text-[--primary-foreground-color]",
+        "sm:hover:bg-[var(--primary-color-hover)] sm:hover:text-[--primary-foreground-color] sm:active:bg-[var(--primary-color-active)] sm:active:text-[--primary-foreground-color]",
     },
     {
       variant: "default",
@@ -38,7 +38,7 @@ const iconButtonVariants = cva("flex items-center justify-center rounded-md", {
     {
       variant: "primary",
       isDisabled: false,
-      class: "hover:bg-btn-hover-color active:bg-btn-active-color",
+      class: "sm:hover:bg-btn-hover-color sm:active:bg-btn-active-color",
     },
     {
       variant: "primary",
@@ -48,18 +48,18 @@ const iconButtonVariants = cva("flex items-center justify-center rounded-md", {
     {
       variant: "outlineGhost",
       isDisabled: false,
-      class: "hover:bg-cancel-btn-hover active:bg-cancel-btn-active",
+      class: "sm:hover:bg-cancel-btn-hover sm:active:bg-cancel-btn-active",
     },
     {
       variant: "ghost",
       isDisabled: false,
-      class: "hover:bg-cancel-btn-hover active:bg-cancel-btn-active",
+      class: "sm:hover:bg-cancel-btn-hover sm:active:bg-cancel-btn-active",
     },
     {
       variant: "outlinePrimary",
       isDisabled: false,
       class:
-        "hover:bg-btn-hover-color hover:text-[--primary-foreground-color] active:bg-btn-active-color active:text-[--primary-foreground-color]",
+        "sm:hover:bg-btn-hover-color sm:hover:text-[--primary-foreground-color] sm:active:bg-btn-active-color sm:active:text-[--primary-foreground-color]",
     },
     {
       variant: "outlinePrimary",
