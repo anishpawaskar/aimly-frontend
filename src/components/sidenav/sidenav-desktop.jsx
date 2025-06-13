@@ -74,7 +74,11 @@ const SidenavDesktop = () => {
       <div className="w-full h-8 group/sidenav">
         <Tooltip>
           <TooltipTrigger asChild>
-            <Link to={"/"} className="w-full h-full flex justify-center">
+            <Link
+              to={"/"}
+              reloadDocument
+              className="w-full h-full flex justify-center"
+            >
               <button>
                 <LogOut
                   size={22}

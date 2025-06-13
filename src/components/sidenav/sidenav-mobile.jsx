@@ -84,7 +84,7 @@ const SidenavMobile = () => {
           })}
         </ul>
         <div>
-          <Link to={"/"} className="w-full py-2">
+          <Link to={"/"} reloadDocument className="w-full py-2">
             <button className="h-full w-full flex items-center gap-2.5">
               <LogOut size={22} className="text-gray/60 rotate-180" />
               <span className="text-sm text-gray">Logout</span>
