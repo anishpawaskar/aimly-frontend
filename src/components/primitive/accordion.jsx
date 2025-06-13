@@ -95,7 +95,7 @@ const AccordionTrigger = ({ children, asChild = false, className }) => {
   };
 
   return (
-    <div className="relative">
+    <div className="relative w-full">
       <ChevronDown
         size={16}
         className={cn(
