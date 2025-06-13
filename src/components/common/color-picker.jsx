@@ -64,6 +64,7 @@ export const ColorPicker = ({
 
           return (
             <button
+              key={color.name}
               style={{ background: color.color }}
               className={cn(
                 "h-[18px] w-[18px] rounded-full transition-all",
