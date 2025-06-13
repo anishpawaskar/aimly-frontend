@@ -8,10 +8,18 @@ export const Slot = ({ children, ...props }) => {
     return <>{children}</>;
   }
 
+  let elementClassName;
+
+  if (typeof element.props.className === "function") {
+    elementClassName = element.props.className();
+  } else {
+    elementClassName = element.props.className;
+  }
+
   const mergedProps = {
     ...props,
     ...element.props,
-    className: cn(props.className, element.props.className),
+    className: cn(props.className, elementClassName),
   };
 
   return cloneElement(element, mergedProps);
