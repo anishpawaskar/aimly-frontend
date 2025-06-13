@@ -35,6 +35,7 @@
   --color-btn-disable-color: rgb(181, 199, 253);
   --shadow-default-app: var(--default-shadow);
   --color-auth-bg: rgb(249, 249, 249);
+  --color-sidenav-bg: rgb(249, 249, 249);
 }
 
 @layer base {
@@ -68,10 +69,18 @@
   }
 }
 
-@utility background-gradient-tasks-nav {
+@utility sidenav-gradient-bg {
   background-image: linear-gradient(
     180deg,
     var(--color-tasks-nav-from-color),
     var(--color-tasks-nav-to-color)
+  );
+}
+
+@utility tasks-nav-gradient-bg {
+  background-image: linear-gradient(
+    180deg,
+    rgba(var(--tasks-nav-from-rgb), 0.15),
+    rgba(var(--tasks-nav-to-rgb), 0.15)
   );
 }
