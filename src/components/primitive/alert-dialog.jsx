@@ -27,11 +27,12 @@ const AlertDialog = ({ open, onOpenChange, children }) => {
   );
 };
 
-const AlertDialogTrigger = ({ className, children }) => {
+const AlertDialogTrigger = ({ className, children, asChild = false }) => {
   const { onOpenChange, triggerRef } = useAlertDialog();
+  const Comp = asChild ? Slot : "button";
 
   return (
-    <button
+    <Comp
       className={cn(
         "flex items-center justify-center whitespace-nowrap text-sm rounded-md transition-all",
         className
@@ -40,7 +41,7 @@ const AlertDialogTrigger = ({ className, children }) => {
       onClick={() => onOpenChange((prevState) => !prevState)}
     >
       {children}
-    </button>
+    </Comp>
   );
 };
 
