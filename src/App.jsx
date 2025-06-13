@@ -4,6 +4,7 @@ import Signin from "./pages/auth/signin";
 import AuthLayout from "./pages/auth/layout";
 import Signup from "./pages/auth/signup";
 import DashboardLayout from "./pages/dashboard/layout";
+import TasksLayout from "./pages/tasks/layout";
 
 function App() {
   return (
@@ -14,7 +15,7 @@ function App() {
           <Route path="signin" element={<Signin />} />
           <Route path="signup" element={<Signup />} />
         </Route>
-        <Route element={<DashboardLayout />}>
+        <Route element={<TasksLayout />}>
           <Route
             path="tasks"
             element={
