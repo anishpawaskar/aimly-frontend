@@ -4,6 +4,7 @@ import { cn } from "@/lib/utils";
 import { useTheme } from "@/context/theme-provider";
 import { Accordion } from "../primitive/accordion";
 import { TasksSidenavAccordionItem } from "./sidenav-accodion-item";
+import { TasksSidenavProvider } from "@/context/tasks-sidenav-provider";
 
 export const TasksSidenav = () => {
   const { theme } = useTheme();
@@ -42,7 +43,11 @@ export const TasksSidenav = () => {
       <hr className="text-gray/10 my-2" />
       <Accordion type="multiple" className={"p-0"}>
         {SIDENAV_ACCORDION_ITEMS.map((item) => {
-          return <TasksSidenavAccordionItem key={item.title} item={item} />;
+          return (
+            <TasksSidenavProvider key={item.title}>
+              <TasksSidenavAccordionItem item={item} />
+            </TasksSidenavProvider>
+          );
         })}
       </Accordion>
     </div>
