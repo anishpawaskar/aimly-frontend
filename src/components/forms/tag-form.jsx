@@ -9,10 +9,10 @@ import {
 } from "../primitive/alert-dialog";
 import { Input } from "../primitive/input";
 import { Button } from "../primitive/button";
-import { useTasksSidenav } from "../tasks/sidenav-accodion-item";
 import { BASE_INTERVAL } from "@/constants";
 import { generateSortOrder } from "@/lib/utils";
 import { v4 as uuidV4 } from "uuid";
+import { useTasksSidenav } from "@/context/tasks-sidenav-provider";
 
 const TagForm = ({ onOpenChange }) => {
   const [formData, setFormData] = useState({

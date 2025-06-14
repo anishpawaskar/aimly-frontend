@@ -18,9 +18,9 @@ import { Input } from "../primitive/input";
 import { cn, generateSortOrder } from "@/lib/utils";
 import { ColorPicker } from "../common/color-picker";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../primitive/tooltip";
-import { useTasksSidenav } from "../tasks/sidenav-accodion-item";
 import { BASE_INTERVAL } from "@/constants";
 import { v4 as uuidV4 } from "uuid";
+import { useTasksSidenav } from "@/context/tasks-sidenav-provider";
 
 const PROJECT_VIEW_TYPE = [
   {
