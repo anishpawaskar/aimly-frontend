@@ -10,6 +10,7 @@ import { NavLink } from "react-router";
 import { AlertDialog, AlertDialogTrigger } from "../primitive/alert-dialog";
 import { useState } from "react";
 import { useTasksSidenav } from "@/context/tasks-sidenav-provider";
+import { SidenavAccordionContent } from "./sidenav-accordion-content";
 
 export const TasksSidenavAccordionItem = ({ item }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -48,7 +49,7 @@ export const TasksSidenavAccordionItem = ({ item }) => {
         </div>
       </Button>
 
-      <AccordionContent asChild>
+      {/* <AccordionContent asChild>
         <ul
           // TODO: figure out way to hide scroll because two two scolls are appearing
           className="max-h-none"
@@ -104,7 +105,8 @@ export const TasksSidenavAccordionItem = ({ item }) => {
               })
           )}
         </ul>
-      </AccordionContent>
+      </AccordionContent> */}
+      <SidenavAccordionContent item={item} />
     </AccordionItem>
   );
 };

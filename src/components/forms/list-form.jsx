@@ -81,14 +81,14 @@ const ListForm = ({ onOpenChange }) => {
     let sortOrder;
 
     if (items.length) {
-      sortOrder = generateSortOrder(items[0]);
+      sortOrder = generateSortOrder({ items });
     } else {
       sortOrder = -BASE_INTERVAL;
     }
 
     formData._id = uuidV4();
     formData.sortOrder = sortOrder;
-    setItems((prevItems) => [formData, ...prevItems]);
+    setItems((prevItems) => [...prevItems, formData]);
     resetState();
     onOpenChange(false);
   };
