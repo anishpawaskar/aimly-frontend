@@ -1,4 +1,4 @@
-import { GAP_BETWEEN_SCREEN } from "@/constants";
+import { BASE_INTERVAL, GAP_BETWEEN_SCREEN } from "@/constants";
 import clsx from "clsx";
 import { twMerge } from "tailwind-merge";
 
@@ -41,4 +41,8 @@ export const validateInputs = (values, defaultErrors) => {
 export const isValidEmail = (email) => {
   const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/;
   return emailRegex.test(email);
+};
+
+export const generateSortOrder = (value) => {
+  return value.sortOrder - BASE_INTERVAL;
 };
