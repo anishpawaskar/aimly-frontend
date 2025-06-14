@@ -9,6 +9,10 @@ import {
 } from "../primitive/alert-dialog";
 import { Input } from "../primitive/input";
 import { Button } from "../primitive/button";
+import { useTasksSidenav } from "../tasks/sidenav-accodion-item";
+import { BASE_INTERVAL } from "@/constants";
+import { generateSortOrder } from "@/lib/utils";
+import { v4 as uuidV4 } from "uuid";
 
 const TagForm = ({ onOpenChange }) => {
   const [formData, setFormData] = useState({
@@ -18,6 +22,19 @@ const TagForm = ({ onOpenChange }) => {
   const [validationError, setValidationError] = useState({
     serverError: "",
   });
+
+  const { items, setItems } = useTasksSidenav();
+
+  const resetState = () => {
+    setFormData({
+      name: "",
+      color: "",
+    });
+    setValidationError((prevErrors) => ({
+      ...prevErrors,
+      serverError: "",
+    }));
+  };
 
   const handleColorPicker = (color) => {
     setFormData((prevFormData) => ({
@@ -31,19 +48,24 @@ const TagForm = ({ onOpenChange }) => {
   };
 
   const handleSubmit = () => {
+    let sortOrder;
+
+    if (items.length) {
+      sortOrder = generateSortOrder(items[0]);
+    } else {
+      sortOrder = -BASE_INTERVAL;
+    }
+
+    formData._id = uuidV4();
+    formData.sortOrder = sortOrder;
+    setItems((prevItems) => [formData, ...prevItems]);
+    resetState();
     onOpenChange(false);
   };
 
   const handleCancel = () => {
     onOpenChange(false);
-    setFormData({
-      name: "",
-      color: "",
-    });
-    setValidationError((prevErrors) => ({
-      ...prevErrors,
-      serverError: "",
-    }));
+    resetState();
   };
 
   return (

@@ -55,7 +55,7 @@ const ListForm = ({ onOpenChange }) => {
 
   const nameInputRef = useRef(null);
 
-  function resetState() {
+  const resetState = () => {
     setFormData({
       name: "",
       color: "",
@@ -64,7 +64,7 @@ const ListForm = ({ onOpenChange }) => {
     setValidationError({
       serverError: "",
     });
-  }
+  };
 
   const handleColorPicker = (color) => {
     setFormData((prevFormData) => ({
