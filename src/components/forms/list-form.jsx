@@ -15,9 +15,12 @@ import {
   Smile,
 } from "lucide-react";
 import { Input } from "../primitive/input";
-import { cn } from "@/lib/utils";
+import { cn, generateSortOrder } from "@/lib/utils";
 import { ColorPicker } from "../common/color-picker";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../primitive/tooltip";
+import { useTasksSidenav } from "../tasks/sidenav-accodion-item";
+import { BASE_INTERVAL } from "@/constants";
+import { v4 as uuidV4 } from "uuid";
 
 const PROJECT_VIEW_TYPE = [
   {
@@ -48,7 +51,20 @@ const ListForm = ({ onOpenChange }) => {
   });
   const [isInputFocus, setIsInputFocus] = useState(false);
 
+  const { items, setItems } = useTasksSidenav();
+
   const nameInputRef = useRef(null);
+
+  function resetState() {
+    setFormData({
+      name: "",
+      color: "",
+      viewType: "list",
+    });
+    setValidationError({
+      serverError: "",
+    });
+  }
 
   const handleColorPicker = (color) => {
     setFormData((prevFormData) => ({
@@ -62,18 +78,23 @@ const ListForm = ({ onOpenChange }) => {
   };
 
   const handleSubmit = () => {
+    let sortOrder;
+
+    if (items.length) {
+      sortOrder = generateSortOrder(items[0]);
+    } else {
+      sortOrder = -BASE_INTERVAL;
+    }
+
+    formData._id = uuidV4();
+    formData.sortOrder = sortOrder;
+    setItems((prevItems) => [formData, ...prevItems]);
+    resetState();
     onOpenChange(false);
   };
 
   const handleCancel = () => {
-    setFormData({
-      name: "",
-      color: "",
-      viewType: "list",
-    });
-    setValidationError({
-      serverError: "",
-    });
+    resetState();
     onOpenChange(false);
   };
 
