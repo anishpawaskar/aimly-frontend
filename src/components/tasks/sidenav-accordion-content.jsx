@@ -1,6 +1,6 @@
-import { AlignJustify, Ellipsis } from "lucide-react";
+import { AlignJustify } from "lucide-react";
 import { AccordionContent } from "../primitive/accordion";
-import { NavLink } from "react-router";
+import { NavLink, useLocation } from "react-router";
 import { useTasksSidenav } from "@/context/tasks-sidenav-provider";
 import {
   cn,
@@ -10,9 +10,12 @@ import {
 } from "@/lib/utils";
 import { useRef } from "react";
 
-export const SidenavAccordionContent = ({ item, content }) => {
+export const SidenavAccordionContent = ({ item }) => {
   const { items, setItems } = useTasksSidenav();
   const data = [...items];
+  const SidenavDropdownMenu = item.dropdownMenu;
+
+  const location = useLocation();
 
   const dragItemRef = useRef(null);
   const dragOverItemRef = useRef(null);
@@ -87,6 +90,9 @@ export const SidenavAccordionContent = ({ item, content }) => {
           data
             .sort((a, b) => a.sortOrder - b.sortOrder)
             .map((dataItem) => {
+              const isActive =
+                location.pathname === item.href({ id: dataItem._id });
+
               return (
                 <li
                   id={dataItem._id}
@@ -94,15 +100,14 @@ export const SidenavAccordionContent = ({ item, content }) => {
                   draggable
                   onDragStart={handleDragStart}
                   onDragEnter={handleDragEnter}
+                  className={cn(
+                    "h-9 pr-2 flex items-center relative group/content sm:hover:bg-cancel-btn-hover sm:active:bg-cancel-btn-active rounded-md transition-colors",
+                    isActive && "bg-gray/5"
+                  )}
                 >
                   <NavLink
                     to={item.href({ id: dataItem._id })}
-                    className={({ isActive }) =>
-                      cn(
-                        "h-9 pl-4 pr-2 flex items-center relative group/content sm:hover:bg-cancel-btn-hover sm:active:bg-cancel-btn-active rounded-md transition-colors",
-                        isActive && "bg-gray/5"
-                      )
-                    }
+                    className={"h-full flex flex-1 items-center pl-4"}
                   >
                     <AlignJustify
                       size={18}
@@ -111,26 +116,23 @@ export const SidenavAccordionContent = ({ item, content }) => {
                     <span className="flex-1 text-sm text-gray truncate">
                       {dataItem.name}
                     </span>
-                    <button
-                      className={cn(
-                        "shrink-0 h-5 w-5 hidden group-hover/content:block"
-                      )}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        e.preventDefault();
-                        console.log("open dropdown menu");
+                    <div
+                      style={{
+                        backgroundColor: dataItem.color,
                       }}
-                    >
-                      <Ellipsis size={16} className="text-gray/40" />
-                    </button>
+                      className="w-2 h-2 rounded-full mx-1.5"
+                    ></div>
+                  </NavLink>
+                  <div className="shrink-0 h-full flex items-center justify-center">
+                    <SidenavDropdownMenu data={dataItem} />
                     <span
-                      className={cn(
-                        "text-xs text-gray/40 absolute right-[15px] top-1/2 -translate-y-1/2 group-hover/content:hidden block"
-                      )}
+                      className={
+                        "text-xs text-gray/40 absolute right-[15px] top-1/2 -translate-y-1/2 group-hover/content:invisible visible"
+                      }
                     >
                       3
                     </span>
-                  </NavLink>
+                  </div>
                 </li>
               );
             })
