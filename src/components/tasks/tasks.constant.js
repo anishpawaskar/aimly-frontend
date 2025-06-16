@@ -7,7 +7,7 @@ import { TagsDropdownMenu } from "./tags/tags-dropdown-menu";
 export const SMART_LIST = [
   {
     name: "Inbox",
-    href: "/tasks/inbox",
+    href: "/tasks/inbox", // TODO: replace this with function
     icon: Inbox,
   },
   {

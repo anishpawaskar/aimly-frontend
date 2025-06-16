@@ -33,7 +33,7 @@ function App() {
           <Route path="signin" element={<Signin />} />
           <Route path="signup" element={<Signup />} />
         </Route>
-        <Route path="/tasks" element={<TasksLayout />}>
+        <Route path="/projects/:projectId/tasks" element={<TasksLayout />}>
           <Route
             index
             element={
