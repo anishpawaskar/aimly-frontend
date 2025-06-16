@@ -63,6 +63,8 @@ const DropdownMenuContent = ({
   className,
   side = "bottom",
   sideOffset = 10,
+  align = "center",
+  alignOffset = 0,
   children,
 }) => {
   const {
@@ -110,7 +112,44 @@ const DropdownMenuContent = ({
           const triggerMiddleX = triggerRect.left + triggerRect.width / 2;
           const potentialX = triggerMiddleX - contentRect.width / 2;
 
-          x = clampX(potentialX, contentRect.width);
+          switch (align) {
+            case "center": {
+              x = clampX(potentialX, contentRect.width);
+              break;
+            }
+
+            case "end": {
+              const isOverflowingEnd =
+                triggerRect.right +
+                  contentRect.width +
+                  alignOffset +
+                  GAP_BETWEEN_SCREEN >
+                windowWidth;
+
+              if (isOverflowingEnd) {
+                x = triggerRect.left - contentRect.width + alignOffset;
+              } else {
+                x = triggerRect.right - alignOffset;
+              }
+              break;
+            }
+
+            case "start": {
+              const isOverFlowingStart =
+                triggerRect.left -
+                  contentRect.width -
+                  GAP_BETWEEN_SCREEN +
+                  alignOffset <
+                0;
+
+              if (isOverFlowingStart) {
+                x = triggerRect.right - alignOffset;
+              } else {
+                x = triggerRect.left - contentRect.width + alignOffset;
+              }
+              break;
+            }
+          }
 
           const potentialY = triggerRect.bottom + sideOffset;
           const isOverflowingBottom =
@@ -129,7 +168,44 @@ const DropdownMenuContent = ({
           const triggerMiddleX = triggerRect.right - triggerRect.width / 2;
           const potentialX = triggerMiddleX - contentRect.width / 2;
 
-          x = clampX(potentialX, contentRect.width);
+          switch (align) {
+            case "center": {
+              x = clampX(potentialX, contentRect.width);
+              break;
+            }
+
+            case "end": {
+              const isOverflowingEnd =
+                triggerRect.right +
+                  contentRect.width +
+                  alignOffset +
+                  GAP_BETWEEN_SCREEN >
+                windowWidth;
+
+              if (isOverflowingEnd) {
+                x = triggerRect.left - contentRect.width + alignOffset;
+              } else {
+                x = triggerRect.right - alignOffset;
+              }
+              break;
+            }
+
+            case "start": {
+              const isOverFlowingStart =
+                triggerRect.left -
+                  contentRect.width -
+                  GAP_BETWEEN_SCREEN +
+                  alignOffset <
+                0;
+
+              if (isOverFlowingStart) {
+                x = triggerRect.right - alignOffset;
+              } else {
+                x = triggerRect.left - contentRect.width + alignOffset;
+              }
+              break;
+            }
+          }
 
           const potentialY = triggerRect.top - contentRect.height - sideOffset;
           const isOverflowingTop = potentialY + GAP_BETWEEN_SCREEN < 0;
@@ -147,7 +223,44 @@ const DropdownMenuContent = ({
           const triggerMiddleY = triggerRect.top + triggerRect.height / 2;
           const potentialY = triggerMiddleY - contentRect.height / 2;
 
-          y = clampY(potentialY, contentRect.height);
+          switch (align) {
+            case "center": {
+              y = clampY(potentialY, contentRect.height);
+              break;
+            }
+
+            case "end": {
+              const isOverFlowingEnd =
+                triggerRect.bottom +
+                  contentRect.height +
+                  alignOffset +
+                  GAP_BETWEEN_SCREEN >
+                windowHeight;
+
+              if (isOverFlowingEnd) {
+                y = triggerRect.top - contentRect.height - alignOffset;
+              } else {
+                y = triggerRect.bottom + alignOffset;
+              }
+              break;
+            }
+
+            case "start": {
+              const isOverFlowingStart =
+                triggerRect.top -
+                  contentRect.height -
+                  alignOffset -
+                  GAP_BETWEEN_SCREEN <
+                0;
+
+              if (isOverFlowingStart) {
+                y = triggerRect.bottom + alignOffset;
+              } else {
+                y = triggerRect.top - contentRect.height - alignOffset;
+              }
+              break;
+            }
+          }
 
           const potentialX = triggerRect.right + sideOffset;
           const isOverflowingRight =
@@ -165,7 +278,44 @@ const DropdownMenuContent = ({
           const triggerMiddleY = triggerRect.top + triggerRect.height / 2;
           const potentialY = triggerMiddleY - contentRect.height / 2;
 
-          y = clampY(potentialY, contentRect.height);
+          switch (align) {
+            case "center": {
+              y = clampY(potentialY, contentRect.height);
+              break;
+            }
+
+            case "end": {
+              const isOverFlowingEnd =
+                triggerRect.bottom +
+                  contentRect.height +
+                  alignOffset +
+                  GAP_BETWEEN_SCREEN >
+                windowHeight;
+
+              if (isOverFlowingEnd) {
+                y = triggerRect.top - contentRect.height - alignOffset;
+              } else {
+                y = triggerRect.bottom + alignOffset;
+              }
+              break;
+            }
+
+            case "start": {
+              const isOverFlowingStart =
+                triggerRect.top -
+                  contentRect.height -
+                  alignOffset -
+                  GAP_BETWEEN_SCREEN <
+                0;
+
+              if (isOverFlowingStart) {
+                y = triggerRect.bottom + alignOffset;
+              } else {
+                y = triggerRect.top - contentRect.height - alignOffset;
+              }
+              break;
+            }
+          }
 
           const potentialX = triggerRect.left - contentRect.width - sideOffset;
           const isOverflowingLeft = potentialX + GAP_BETWEEN_SCREEN < 0;
@@ -202,7 +352,7 @@ const DropdownMenuContent = ({
       style={contentStyles}
       ref={contentRef}
       className={cn(
-        "fixed top-0 left-0 z-30 bg-card-bg rounded-md p-1.5 min-w-40 shadow-default-app flex flex-col",
+        "fixed top-0 left-0 z-30 bg-card-bg rounded-md p-1.5 shadow-default-app flex flex-col",
         className
       )}
     >
@@ -222,10 +372,10 @@ const DropdownMenuItem = ({
   const Comp = asChild ? Slot : "button";
 
   return (
-    <li className="h-8 rounded-md">
+    <li className="rounded-md">
       <Comp
         className={cn(
-          "w-full h-full flex items-center text-[13px] leading-8 truncate px-3",
+          "h-8 flex items-center text-[13px] leading-8 truncate px-3 min-w-36",
           className
         )}
         disabled={disabled}
