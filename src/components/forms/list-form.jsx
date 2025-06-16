@@ -40,11 +40,11 @@ const PROJECT_VIEW_TYPE = [
   },
 ];
 
-const ListForm = ({ onOpenChange }) => {
+const ListForm = ({ data, onOpenChange }) => {
   const [formData, setFormData] = useState({
-    name: "",
-    color: "",
-    viewType: "list",
+    name: data?.name || "",
+    color: data?.color || "",
+    viewType: data?.viewType || "list",
   });
   const [validationError, setValidationError] = useState({
     serverError: "",
