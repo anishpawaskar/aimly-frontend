@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ColorPicker } from "../common/color-picker";
 import {
   AlertDialogAction,
@@ -14,10 +14,10 @@ import { generateSortOrder } from "@/lib/utils";
 import { v4 as uuidV4 } from "uuid";
 import { useTasksSidenav } from "@/context/tasks-sidenav-provider";
 
-const TagForm = ({ onOpenChange }) => {
+const TagForm = ({ data, onOpenChange }) => {
   const [formData, setFormData] = useState({
-    name: "",
-    color: "",
+    name: data?.name || "",
+    color: data?.color || "",
   });
   const [validationError, setValidationError] = useState({
     serverError: "",
