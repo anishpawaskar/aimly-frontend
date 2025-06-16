@@ -49,7 +49,7 @@ export const ProjectsDropdownMenu = ({ data }) => {
             <Ellipsis size={16} className="text-gray/40" />
           </button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent>
+        <DropdownMenuContent align="end" sideOffset={-10} alignOffset={10}>
           {PROJECTS_DROPDOWN_MENU_ITEM.map((menuItem) => {
             return (
               <DropdownMenuItem key={menuItem.name} asChild>

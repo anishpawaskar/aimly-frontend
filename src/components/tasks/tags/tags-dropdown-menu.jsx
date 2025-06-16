@@ -54,7 +54,7 @@ export const TagsDropdownMenu = ({ data }) => {
             <Ellipsis size={16} className="text-gray/40" />
           </button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent>
+        <DropdownMenuContent align="end" alignOffset={10} sideOffset={-10}>
           {TAGS_DROPDOWN_MENU_ITEM.map((menuItem) => {
             return (
               <DropdownMenuItem key={menuItem.name} asChild>
