@@ -1,4 +1,4 @@
-import { AlignJustify, Ellipsis } from "lucide-react";
+import { AlignJustify } from "lucide-react";
 import { AccordionContent } from "../primitive/accordion";
 import { NavLink, useLocation } from "react-router";
 import { useTasksSidenav } from "@/context/tasks-sidenav-provider";
@@ -10,9 +10,10 @@ import {
 } from "@/lib/utils";
 import { useRef } from "react";
 
-export const SidenavAccordionContent = ({ item, content }) => {
+export const SidenavAccordionContent = ({ item }) => {
   const { items, setItems } = useTasksSidenav();
   const data = [...items];
+  const SidenavDropdownMenu = item.dropdownMenu;
 
   const location = useLocation();
 
@@ -123,16 +124,7 @@ export const SidenavAccordionContent = ({ item, content }) => {
                     ></div>
                   </NavLink>
                   <div className="shrink-0 h-full flex items-center justify-center">
-                    <button
-                      className={cn(
-                        "shrink-0 h-5 w-5 invisible group-hover/content:visible"
-                      )}
-                      onClick={(e) => {
-                        console.log("open dropdown menu");
-                      }}
-                    >
-                      <Ellipsis size={16} className="text-gray/40" />
-                    </button>
+                    <SidenavDropdownMenu data={dataItem} />
                     <span
                       className={
                         "text-xs text-gray/40 absolute right-[15px] top-1/2 -translate-y-1/2 group-hover/content:invisible visible"

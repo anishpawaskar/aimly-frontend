@@ -1,6 +1,8 @@
 import { Inbox, SquareCheckBig, Trash2 } from "lucide-react";
 import ListForm from "../forms/list-form";
 import TagForm from "../forms/tag-form";
+import { ProjectsDropdownMenu } from "./projects/projects-dropdown-menu";
+import { TagsDropdownMenu } from "./tags/tags-dropdown-menu";
 
 export const SMART_LIST = [
   {
@@ -27,6 +29,7 @@ export const SIDENAV_ACCORDION_ITEMS = [
     form: ListForm,
     href: ({ id }) => `/projects/${id}/tasks`,
     fallbackText: "Use lists to categorize and manage your tasks and notes",
+    dropdownMenu: ProjectsDropdownMenu,
   },
   {
     title: "Tags",
@@ -34,5 +37,6 @@ export const SIDENAV_ACCORDION_ITEMS = [
     form: TagForm,
     href: ({ id }) => `/tags/${id}/tasks`,
     fallbackText: `Categorize your tasks with tags. Quickly select a tag by typing "#" when adding a task`,
+    dropdownMenu: TagsDropdownMenu,
   },
 ];
