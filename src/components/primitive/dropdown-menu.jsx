@@ -391,6 +391,8 @@ const DropdownMenuSeparator = () => {
   return <hr className="my-1 text-gray/30" />;
 };
 
+// TODO: later add sub content and grouping
+
 export {
   DropdownMenu,
   DropdownMenuTrigger,
