@@ -25,14 +25,14 @@ export const SIDENAV_ACCORDION_ITEMS = [
     title: "Lists",
     value: "lists",
     form: ListForm,
-    href: ({ id }) => `/#p/${id}/tasks`,
+    href: ({ id }) => `/projects/${id}/tasks`,
     fallbackText: "Use lists to categorize and manage your tasks and notes",
   },
   {
     title: "Tags",
     value: "tags",
     form: TagForm,
-    href: ({ id }) => `/#t/${id}/tasks`,
+    href: ({ id }) => `/tags/${id}/tasks`,
     fallbackText: `Categorize your tasks with tags. Quickly select a tag by typing "#" when adding a task`,
   },
 ];
