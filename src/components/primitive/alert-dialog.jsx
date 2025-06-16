@@ -81,7 +81,7 @@ const AlertDialogDescription = ({ className, asChild = false, children }) => {
   const Comp = asChild ? Slot : "p";
 
   return (
-    <Comp className={cn("text-sm text-gray flex-1", className)}>
+    <Comp className={cn("text-sm text-gray flex-1 break-words", className)}>
       {children}
     </Comp>
   );
