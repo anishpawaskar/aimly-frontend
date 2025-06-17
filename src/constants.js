@@ -31,3 +31,6 @@ export const CALENDAR_MONTHS = {
   December: "Dec",
 };
 export const CALENDAR_WEEKS = 6;
+export const ONE_DAY_MS = 24 * 60 * 60 * 1000;
+export const ONE_WEEK_MS = ONE_DAY_MS * 7;
+export const ONE_MONTH_MS = ONE_DAY_MS * 30;
