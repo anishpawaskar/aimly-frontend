@@ -104,3 +104,24 @@ export const generateCalendar = (month = THIS_MONTH, year = THIS_YEAR) => {
 
   return [...prevMonthDates, ...thisMonthDates, ...nextMonthDates];
 };
+
+export const isToday = (date) => {
+  if (!isValidDate(date)) {
+    return false;
+  }
+
+  const baseDate = new Date();
+
+  const baseDate_date = baseDate.getDate();
+  const baseDateMonth = baseDate.getMonth() + 1;
+  const baseDateYear = baseDate.getFullYear();
+  const date_date = date.getDate();
+  const dateMonth = date.getMonth() + 1;
+  const dateYear = date.getFullYear();
+
+  return (
+    baseDate_date === date_date &&
+    baseDateMonth === dateMonth &&
+    baseDateYear === dateYear
+  );
+};

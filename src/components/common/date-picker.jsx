@@ -21,13 +21,21 @@ import { useState } from "react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../primitive/tooltip";
 import {
   CALENDAR_MONTHS,
+  CALENDAR_WEEKS,
   ONE_DAY_MS,
   ONE_MONTH_MS,
   ONE_WEEK_MS,
   THIS_MONTH,
   THIS_YEAR,
+  WEEK_DAYS,
 } from "@/constants";
-import { getNextMonth, getPrevMonth } from "@/lib/date-picker.helper";
+import {
+  generateCalendar,
+  getNextMonth,
+  getPrevMonth,
+  isToday,
+} from "@/lib/date-picker.helper";
+import { cn } from "@/lib/utils";
 
 const DATE_OPTIONS = [
   {
@@ -52,12 +60,14 @@ const DatePicker = ({ selectedDate, setSelectedDate }) => {
   const [isOpen, setIsOpen] = useState(false);
 
   const monthsKeys = Object.keys(CALENDAR_MONTHS);
-  console.log("selected month", selectedDate);
 
   const currentMonth = selectedDate?.month
     ? CALENDAR_MONTHS[monthsKeys[selectedDate?.month - 1]]
     : CALENDAR_MONTHS[monthsKeys[THIS_MONTH - 1]];
   const currentYear = selectedDate?.year ? selectedDate?.year : THIS_YEAR;
+
+  const days = generateCalendar(selectedDate?.month, selectedDate?.year);
+  const totalDaysInWeek = Object.keys(WEEK_DAYS).length;
 
   const handlePrevMonth = () => {
     const { month, year } = getPrevMonth(
@@ -110,7 +120,7 @@ const DatePicker = ({ selectedDate, setSelectedDate }) => {
                     const currentYear = THIS_YEAR;
 
                     setSelectedDate({
-                      currentDate: currentDate.toISOString(),
+                      currentDate: currentDate,
                       month: currentMonth,
                       year: currentYear,
                     });
@@ -125,7 +135,7 @@ const DatePicker = ({ selectedDate, setSelectedDate }) => {
                     const tomorrowDateYear = tomorrowDate.getFullYear();
 
                     setSelectedDate({
-                      currentDate: tomorrowDate.toISOString(),
+                      currentDate: tomorrowDate,
                       month: tomorrowDateMonth,
                       year: tomorrowDateYear,
                     });
@@ -140,7 +150,7 @@ const DatePicker = ({ selectedDate, setSelectedDate }) => {
                     const nextWeekYear = nextWeekDate.getFullYear();
 
                     setSelectedDate({
-                      currentDate: nextWeekDate.toISOString(),
+                      currentDate: nextWeekDate,
                       month: nextWeekMonth,
                       year: nextWeekYear,
                     });
@@ -155,7 +165,7 @@ const DatePicker = ({ selectedDate, setSelectedDate }) => {
                     const nextMonth_Year = nextMonthDate.getFullYear();
 
                     setSelectedDate({
-                      currentDate: nextMonthDate.toISOString(),
+                      currentDate: nextMonthDate,
                       month: nextMonth_Month,
                       year: nextMonth_Year,
                     });
@@ -170,7 +180,6 @@ const DatePicker = ({ selectedDate, setSelectedDate }) => {
                     <IconButton
                       variant={"ghost"}
                       size={"sm"}
-                      className={"bg-red-300"}
                       onClick={() => handleDateOptiom(dateOption.label)}
                     >
                       <IconComponent size={20} />
@@ -209,6 +218,90 @@ const DatePicker = ({ selectedDate, setSelectedDate }) => {
                   <ChevronRight size={16} className="text-gray/40" />
                 </IconButton>
               </div>
+            </div>
+            <div className="calendar-body">
+              <ul className="flex flex-col">
+                <li className="calendar-weeks flex items-center justify-between text-xs">
+                  {Object.keys(WEEK_DAYS).map((day) => {
+                    return (
+                      <span
+                        key={day}
+                        className="h-7 w-7 flex items-center justify-center text-gray/40 text-center"
+                      >
+                        {WEEK_DAYS[day][0]}
+                      </span>
+                    );
+                  })}
+                </li>
+                {[...new Array(CALENDAR_WEEKS)].map((_, idx) => {
+                  return (
+                    <li
+                      key={idx}
+                      className="flex items-center justify-between text-xs"
+                    >
+                      {days
+                        .slice(
+                          idx * totalDaysInWeek,
+                          (idx + 1) * totalDaysInWeek
+                        )
+                        .map((date) => {
+                          const _date = new Date(date.join("-"));
+                          const _isToday = isToday(_date);
+                          const isCurrentMonth = selectedDate?.month
+                            ? date[1] === selectedDate?.month
+                            : date[1] === THIS_MONTH;
+
+                          let isSelectedDate = false;
+
+                          if (selectedDate?.currentDate) {
+                            const _date = new Date(selectedDate?.currentDate);
+                            const date_date = _date.getDate();
+                            const dateMonth = _date.getMonth() + 1;
+                            const dateYear = _date.getFullYear();
+                            console.log(date_date, dateMonth, dateYear);
+
+                            isSelectedDate =
+                              date_date === date[date.length - 1] &&
+                              dateMonth === date[1] &&
+                              dateYear === date[0];
+                          }
+
+                          const handleDate = () => {
+                            const _date = new Date(date.join("-"));
+                            const month = _date.getMonth() + 1;
+                            const year = _date.getFullYear();
+
+                            setSelectedDate((prevState) => ({
+                              ...prevState,
+                              currentDate: _date,
+                              month,
+                              year,
+                            }));
+                          };
+
+                          return (
+                            <button
+                              key={date.join("-")}
+                              className={cn(
+                                "h-7 w-7 flex items-center justify-center text-center rounded-full transition-colors",
+                                _isToday && "text-primary bg-primary/10",
+                                !isCurrentMonth && "text-gray/40",
+                                isSelectedDate &&
+                                  "bg-primary text-primary-foreground",
+                                !_isToday &&
+                                  !isSelectedDate &&
+                                  "sm:hover:bg-cancel-btn-hover sm:active:bg-cancel-btn-active"
+                              )}
+                              onClick={handleDate}
+                            >
+                              {date[date.length - 1]}
+                            </button>
+                          );
+                        })}
+                    </li>
+                  );
+                })}
+              </ul>
             </div>
           </div>
         </div>
