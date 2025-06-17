@@ -42,21 +42,21 @@ const PopoverMenu = ({ open, onOpenChange, children }) => {
   );
 };
 
-const PopoverMenuTrigger = ({ className, children, ...props }) => {
+const PopoverMenuTrigger = ({ className, asChild = false, children }) => {
+  const Comp = asChild ? Slot : "button";
   const {
     setIsOpen,
     refs: { triggerRef },
   } = usePopoverMenu();
 
   return (
-    <button
+    <Comp
       ref={triggerRef}
       className={cn("border rounded-md h-10 px-2", className)}
       onClick={() => setIsOpen((prevState) => !prevState)}
-      {...props}
     >
       {children}
-    </button>
+    </Comp>
   );
 };
 
@@ -103,9 +103,6 @@ const PopoverMenuContent = ({
       const contentRect = contentRef.current.getBoundingClientRect();
       const windowWidth = window.innerWidth;
       const windowHeight = window.innerHeight;
-
-      console.log("trigger rect", triggerRect);
-      console.log("content rect", contentRect);
 
       let x; // horizontal
       let y; // vertical
