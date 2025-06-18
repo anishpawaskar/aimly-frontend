@@ -1,6 +1,16 @@
 import { cn } from "@/lib/utils";
-import { useRef, useState } from "react";
+import { useState } from "react";
 import { ExpandableTextarea } from "../common/expandable-textarea";
+import {
+  DatePicker,
+  DatePickerContent,
+  DatePickerTrigger,
+} from "../common/date-picker";
+import {
+  PriorityMenu,
+  PriorityMenuContent,
+  PriorityMenuTrigger,
+} from "../tasks/priority-menu";
 
 export const TaskForm = () => {
   const [formData, setFormData] = useState({
@@ -8,6 +18,9 @@ export const TaskForm = () => {
     content: "",
   });
   const [isInputFocused, setIsInputFocused] = useState(false);
+  const [isCalendarOpen, setIsCalendarOpen] = useState(false);
+  const [date, setDate] = useState(null);
+  const [priority, setPriority] = useState(0);
 
   const handleOnChange = (e) => {
     const { name, value } = e.target;
@@ -51,6 +64,31 @@ export const TaskForm = () => {
           onFocus={() => setIsInputFocused(true)}
           onBlur={() => setIsInputFocused(false)}
         />
+      </div>
+      <div className="task-form-footer flex items-center justify-between pl-1.5 pr-3 pb-1.5">
+        <div className="task-form-actions flex items-center">
+          <DatePicker
+            date={date}
+            open={isCalendarOpen}
+            setDate={setDate}
+            setOpen={setIsCalendarOpen}
+          >
+            <DatePickerTrigger />
+            <DatePickerContent
+              clearState={() => {
+                setDate(null);
+              }}
+              onSelect={(date) => {
+                setDate(date);
+                setIsCalendarOpen(false);
+              }}
+            />
+          </DatePicker>
+          <PriorityMenu value={priority} onValueChange={setPriority}>
+            <PriorityMenuTrigger className={"h-7 w-7"} />
+            <PriorityMenuContent />
+          </PriorityMenu>
+        </div>
       </div>
     </div>
   );
