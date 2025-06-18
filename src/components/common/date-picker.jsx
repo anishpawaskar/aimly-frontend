@@ -120,6 +120,12 @@ const DatePicker = ({ selectedDate, setSelectedDate }) => {
     setCalendarView((prevState) => (prevState === "date" ? "month" : "date"));
   };
 
+  const handleClear = () => {
+    setCalendarView("date");
+    setSelectedDate(null);
+    setIsOpen(false);
+  };
+
   return (
     <PopoverMenu open={isOpen} onOpenChange={setIsOpen}>
       <PopoverMenuTrigger asChild>
@@ -338,7 +344,6 @@ const DatePicker = ({ selectedDate, setSelectedDate }) => {
                               const date_date = _date.getDate();
                               const dateMonth = _date.getMonth() + 1;
                               const dateYear = _date.getFullYear();
-                              console.log(date_date, dateMonth, dateYear);
 
                               isSelectedDate =
                                 date_date === date[date.length - 1] &&
@@ -387,7 +392,9 @@ const DatePicker = ({ selectedDate, setSelectedDate }) => {
           </div>
         </div>
         <PopoverMenuFooter>
-          <PopoverMenuCancel className={"h-8 w-full"}>Cancel</PopoverMenuCancel>
+          <PopoverMenuCancel className={"h-8 w-full"} asChild>
+            <button onClick={handleClear}>Cancel</button>
+          </PopoverMenuCancel>
           <PopoverMenuAction asChild>
             <button
               onClick={() => {
