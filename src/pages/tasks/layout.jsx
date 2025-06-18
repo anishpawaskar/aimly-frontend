@@ -1,4 +1,5 @@
 import { Sidenav } from "@/components/sidenav/sidenav";
+import { TasksListView } from "@/components/tasks/tasks-list-view";
 import { TasksSidenav } from "@/components/tasks/tasks-sidenav";
 
 const TasksLayout = () => {
@@ -7,7 +8,9 @@ const TasksLayout = () => {
       <Sidenav />
       <div className="list-view-wrapper w-full flex">
         <TasksSidenav />
-        <div className="tasks-view-wrapper"></div>
+        <div className="tasks-view-wrapper w-full overflow-hidden flex">
+          <TasksListView />
+        </div>
       </div>
     </div>
   );
