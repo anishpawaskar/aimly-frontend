@@ -1,4 +1,4 @@
-import { clampX, cn } from "@/lib/utils";
+import { clampX, clampY, cn } from "@/lib/utils";
 import {
   createContext,
   useContext,
@@ -67,6 +67,7 @@ const PopoverMenuContent = ({
   sideOffset = 10,
   align = "center",
   alignOffset = 0,
+  handleReset = () => {},
   children,
 }) => {
   const {
@@ -89,6 +90,7 @@ const PopoverMenuContent = ({
         !content.contains(e.target)
       ) {
         setIsOpen(false);
+        handleReset();
       }
     };
 
