@@ -11,6 +11,7 @@ import {
   PriorityMenuContent,
   PriorityMenuTrigger,
 } from "../tasks/priority-menu";
+import { Button } from "../primitive/button";
 
 export const TaskForm = () => {
   const [formData, setFormData] = useState({
@@ -22,10 +23,16 @@ export const TaskForm = () => {
   const [date, setDate] = useState(null);
   const [priority, setPriority] = useState(0);
 
+  const isAddBtnDisabled = formData.title === "" && formData.content === "";
+
   const handleOnChange = (e) => {
     const { name, value } = e.target;
 
     setFormData((prevFormData) => ({ ...prevFormData, [name]: value }));
+  };
+
+  const handleSubmit = () => {
+    console.log("submit form");
   };
 
   return (
@@ -89,6 +96,15 @@ export const TaskForm = () => {
             <PriorityMenuContent />
           </PriorityMenu>
         </div>
+        <Button
+          size={"xs"}
+          variant={"primary"}
+          className={"text-xs"}
+          disabled={isAddBtnDisabled}
+          onClick={handleSubmit}
+        >
+          Add
+        </Button>
       </div>
     </div>
   );
