@@ -105,7 +105,8 @@ const DatePickerTrigger = ({ className }) => {
     } else {
       let monthKey;
       if (selectedDate?.month) {
-        monthKey = Object.keys(CALENDAR_MONTHS)[selectedDate.month - 1];
+        monthKey =
+          Object.keys(CALENDAR_MONTHS)[selectedDate?.currentDate?.getMonth()];
       } else {
         monthKey = Object.keys(CALENDAR_MONTHS)[date?.getMonth()];
       }
@@ -122,7 +123,7 @@ const DatePickerTrigger = ({ className }) => {
         variant={"ghost"}
         className={cn(
           "border-none h-7 w-7 p-0",
-          (date || selectedDate) &&
+          (selectedDate || date) &&
             "text-primary flex items-center gap-1 w-auto px-2",
           className
         )}
@@ -131,10 +132,10 @@ const DatePickerTrigger = ({ className }) => {
           size={16}
           className={cn(
             "text-gray/40",
-            (date || selectedDate) && "text-primary"
+            (selectedDate || date) && "text-primary"
           )}
         />
-        {(date || selectedDate) && (
+        {(selectedDate || date) && (
           <span className="text-xs text-primary">{datePlaceHolder}</span>
         )}
       </IconButton>
@@ -514,7 +515,7 @@ const DatePickerContent = ({
       className={className}
       handleReset={handleClick}
     >
-      <DatePickerHeader />
+      {/* <DatePickerHeader /> */}
       <DatePickerQuickDates />
       <DatePickerCalendar />
       <DatePickerFooter clearState={clearState} onSelect={onSelect} />
