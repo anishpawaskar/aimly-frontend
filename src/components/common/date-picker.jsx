@@ -41,6 +41,7 @@ import {
   getNextMonth,
   getPrevMonth,
   isToday,
+  isTomorrow,
 } from "@/lib/date-picker.helper";
 import { cn } from "@/lib/utils";
 
@@ -97,10 +98,11 @@ const DatePickerTrigger = ({ className }) => {
   let datePlaceHolder;
 
   if (selectedDate || date) {
-    const currentDate = selectedDate?.currentDate?.getDate() || date?.getDate();
-    const tomorrowDate = new Date().getDate() + 1;
+    const inputDate = selectedDate?.currentDate
+      ? new Date(selectedDate?.currentDate)
+      : new Date(date);
 
-    if (currentDate === tomorrowDate) {
+    if (isTomorrow(inputDate)) {
       datePlaceHolder = "Tomorrow";
     } else {
       let monthKey;

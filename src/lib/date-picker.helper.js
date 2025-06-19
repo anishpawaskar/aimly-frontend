@@ -125,3 +125,35 @@ export const isToday = (date) => {
     baseDateYear === dateYear
   );
 };
+
+export const isTomorrow = (date) => {
+  if (!isValidDate(date)) {
+    return false;
+  }
+
+  const today = new Date();
+  const tomorrow = new Date(today);
+  tomorrow.setDate(today.getDate() + 1);
+
+  const inputDate = new Date(date);
+
+  return (
+    inputDate.getDate() === tomorrow.getDate() &&
+    inputDate.getMonth() === tomorrow.getMonth() &&
+    inputDate.getFullYear() === tomorrow.getFullYear()
+  );
+};
+
+export const isDueDateExpired = (date) => {
+  if (!isValidDate(date)) {
+    return false;
+  }
+
+  const currentDate = new Date().valueOf();
+  currentDate.setHours(0, 0, 0, 0);
+
+  const inputDate = new Date(date).valueOf();
+  inputDate.setHours(0, 0, 0, 0);
+
+  return currentDate > inputDate;
+};
