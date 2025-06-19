@@ -12,6 +12,12 @@ import {
   PriorityMenuTrigger,
 } from "../tasks/priority-menu";
 import { Button } from "../primitive/button";
+import {
+  TagSelector,
+  TagSelectorContent,
+  TagSelectorTrigger,
+} from "../common/tag-selector";
+import { Tag } from "lucide-react";
 
 export const TaskForm = () => {
   const [formData, setFormData] = useState({
@@ -22,6 +28,8 @@ export const TaskForm = () => {
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
   const [date, setDate] = useState(null);
   const [priority, setPriority] = useState(0);
+  const [isTagsOpen, setIsTagsOpen] = useState(false);
+  const [tags, setTags] = useState([]);
 
   const isAddBtnDisabled = formData.title === "" && formData.content === "";
 
@@ -95,6 +103,27 @@ export const TaskForm = () => {
             <PriorityMenuTrigger className={"h-7 w-7"} />
             <PriorityMenuContent />
           </PriorityMenu>
+          <TagSelector
+            open={isTagsOpen}
+            setOpen={setIsTagsOpen}
+            tags={tags}
+            setTags={setTags}
+          >
+            <TagSelectorTrigger asChild>
+              <button className="h-7 w-7 border-none p-0">
+                <Tag size={16} className="text-gray/40" />
+              </button>
+            </TagSelectorTrigger>
+            <TagSelectorContent
+              sideoffset={0}
+              align={"end"}
+              alignOffset={30}
+              handleTagSubmit={(selectedTag) => {
+                setTags(selectedTag);
+                setIsTagsOpen(false);
+              }}
+            />
+          </TagSelector>
         </div>
         <Button
           size={"xs"}
