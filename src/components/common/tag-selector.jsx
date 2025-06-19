@@ -10,7 +10,7 @@ import {
 import { Slot } from "../primitive/slot";
 import { cn } from "@/lib/utils";
 import { Button, buttonVariants } from "../primitive/button";
-import { Check, Search, Tag, X } from "lucide-react";
+import { Check, Plus, Search, Tag, X } from "lucide-react";
 import { Input } from "../primitive/input";
 
 const TAGS = [
@@ -199,7 +199,7 @@ const TagSelectorSearchBox = () => {
 };
 
 const TagSelectorHeader = () => {
-  const { tags, selectedTags, setSelectedTags } = useTagSelector();
+  const { selectedTags, setSelectedTags } = useTagSelector();
 
   const handleCancelTag = (tag) => {
     const filteredTag = selectedTags.filter(
@@ -239,7 +239,7 @@ const TagSelectorHeader = () => {
 };
 
 const TagSelectorItem = ({ tag }) => {
-  const { selectedTags, setSelectedTags } = useTagSelector();
+  const { selectedTags, setSelectedTags, setSearch } = useTagSelector();
 
   const isSelected = selectedTags.find(
     (selectedTag) => selectedTag._id === tag._id
@@ -258,6 +258,8 @@ const TagSelectorItem = ({ tag }) => {
     } else {
       setSelectedTags((prevTags) => [...prevTags, tag]);
     }
+
+    setSearch("");
   };
 
   return (
@@ -292,7 +294,8 @@ const TagSelectorItem = ({ tag }) => {
 };
 
 const TagSelectorFooter = ({ handleTagSubmit }) => {
-  const { tags, selectedTags, setOpen, setSelectedTags } = useTagSelector();
+  const { tags, selectedTags, setOpen, setSelectedTags, setSearch } =
+    useTagSelector();
 
   return (
     <PopoverMenuFooter>
@@ -305,6 +308,7 @@ const TagSelectorFooter = ({ handleTagSubmit }) => {
             } else {
               setSelectedTags(tags);
             }
+            setSearch("");
           }}
           className="h-8 w-full"
         >
@@ -315,6 +319,7 @@ const TagSelectorFooter = ({ handleTagSubmit }) => {
         <button
           className="h-8 w-full"
           onClick={() => {
+            setSearch("");
             setSelectedTags(selectedTags);
             handleTagSubmit(selectedTags);
           }}
@@ -334,7 +339,13 @@ const TagSelectorContent = ({
   className,
   handleTagSubmit,
 }) => {
-  const { open, tags, selectedTags, setSelectedTags } = useTagSelector();
+  const { open, tags, selectedTags, setSelectedTags, search, setSearch } =
+    useTagSelector();
+
+  const filteredTags = TAGS.filter((tag) =>
+    search ? tag.name.toLowerCase().includes(search.toLowerCase()) : true
+  );
+  console.log(filteredTags);
 
   const handleReset = () => {
     if (!tags.length) {
@@ -342,6 +353,11 @@ const TagSelectorContent = ({
     } else {
       setSelectedTags(tags);
     }
+    setSearch("");
+  };
+
+  const createNewTag = () => {
+    setSearch("");
   };
 
   if (!open) {
@@ -363,10 +379,26 @@ const TagSelectorContent = ({
     >
       <div className="flex flex-col gap-1.5">
         <TagSelectorHeader />
-        <ul className="flex flex-col max-h-[300px] overflow-y-auto">
-          {TAGS.map((tag) => {
-            return <TagSelectorItem key={tag._id} tag={tag} />;
-          })}
+        <ul className="flex flex-col h-[300px] overflow-y-auto">
+          {!!filteredTags.length ? (
+            filteredTags.map((tag) => {
+              return <TagSelectorItem key={tag._id} tag={tag} />;
+            })
+          ) : (
+            <li>
+              <Button
+                variant={"ghost"}
+                size={"full"}
+                className={"h-8 px-2"}
+                onClick={createNewTag}
+              >
+                <Plus size={16} className="text-gray/40 shrink-0 mr-1.5" />
+                <span className="text-start flex-1 text-xs truncate">
+                  Create Tag "{search}"
+                </span>
+              </Button>
+            </li>
+          )}
         </ul>
       </div>
       <TagSelectorFooter handleTagSubmit={handleTagSubmit} />
