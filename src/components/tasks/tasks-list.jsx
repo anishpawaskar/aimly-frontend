@@ -1,6 +1,5 @@
-import { Link, NavLink, useLocation } from "react-router";
+import { Link, useLocation } from "react-router";
 import { TASKS_DATA } from "./tasks.constant";
-import { cn } from "@/lib/utils";
 import { Ellipsis, Square } from "lucide-react";
 import { useState } from "react";
 import {
@@ -8,7 +7,6 @@ import {
   DatePickerContent,
   DatePickerTrigger,
 } from "../common/date-picker";
-import { isDueDateExpired } from "@/lib/date-picker.helper";
 
 export const TasksList = () => {
   const location = useLocation();
