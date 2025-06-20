@@ -143,17 +143,3 @@ export const isTomorrow = (date) => {
     inputDate.getFullYear() === tomorrow.getFullYear()
   );
 };
-
-export const isDueDateExpired = (date) => {
-  if (!isValidDate(date)) {
-    return false;
-  }
-
-  const currentDate = new Date().valueOf();
-  currentDate.setHours(0, 0, 0, 0);
-
-  const inputDate = new Date(date).valueOf();
-  inputDate.setHours(0, 0, 0, 0);
-
-  return currentDate > inputDate;
-};
