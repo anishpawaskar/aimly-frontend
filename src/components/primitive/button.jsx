@@ -13,6 +13,7 @@ const buttonVariants = cva(
         outlinePrimary: "border border-primary text-primary-foreground",
         outlineGhost: "border border-gray/10 text-gray/60",
         ghost: "text-gray/60",
+        destructive: "text-gray/60",
       },
       size: {
         default: "h-10 px-4",
@@ -67,6 +68,12 @@ const buttonVariants = cva(
         variant: "ghost",
         isDisabled: false,
         class: "sm:hover:bg-cancel-btn-hover sm:active:bg-cancel-btn-active",
+      },
+      {
+        variant: "destructive",
+        isDisabled: false,
+        class:
+          "sm:hover:text-wran-red sm:hover:bg-wran-red/40 active:bg-wran-red/60",
       },
     ],
     defaultVariants: {
