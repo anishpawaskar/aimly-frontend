@@ -391,6 +391,11 @@ const DropdownMenuSeparator = () => {
   return <hr className="my-1 text-gray/30" />;
 };
 
+const DropdownMenuLabel = ({ asChild = false, className, children }) => {
+  const Comp = asChild ? Slot : "p";
+
+  return <Comp className={cn("text-sm text-gray", className)}>{children}</Comp>;
+};
 // TODO: later add sub content and grouping
 
 export {
@@ -399,4 +404,5 @@ export {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
+  DropdownMenuLabel,
 };
