@@ -7,6 +7,11 @@ import {
   DatePickerContent,
   DatePickerTrigger,
 } from "../common/date-picker";
+import {
+  TaskDropdownMenu,
+  TaskDropdownMenuContent,
+  TaskDropdownMenuTrigger,
+} from "./task-dropdown-menu";
 
 export const TasksList = () => {
   const location = useLocation();
@@ -85,9 +90,13 @@ export const TasksList = () => {
                   />
                 </DatePicker>
               )}
-              <button className="shrink-0 h-full sm:invisible sm:group-hover:visible">
+              {/* <button className="shrink-0 h-full sm:invisible sm:group-hover:visible">
                 <Ellipsis size={16} className="text-gray/40" />
-              </button>
+              </button> */}
+              <TaskDropdownMenu task={task}>
+                <TaskDropdownMenuTrigger />
+                <TaskDropdownMenuContent />
+              </TaskDropdownMenu>
             </div>
           </li>
         );
