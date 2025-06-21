@@ -81,17 +81,21 @@ const PopoverMenuContent = ({
 
   useEffect(() => {
     const handleClickOutside = (e) => {
-      const trigger = anchorRef?.current || triggerRef.current;
+      const trigger = triggerRef.current;
       const content = contentRef.current;
 
-      if (
-        trigger &&
-        !trigger.contains(e.target) &&
-        content &&
-        !content.contains(e.target)
-      ) {
-        setIsOpen(false);
-        handleReset();
+      const clickOutSideContent = content && !content.contains(e.target);
+
+      if (!anchorRef) {
+        if (trigger && !trigger.contains(e.target) && clickOutSideContent) {
+          setIsOpen(false);
+          handleReset();
+        }
+      } else {
+        if (clickOutSideContent) {
+          setIsOpen(false);
+          handleReset();
+        }
       }
     };
 
