@@ -66,6 +66,17 @@ const PRIORITIES = [
   },
 ];
 
+const TASK_MENU_OPTIONS = [
+  {
+    name: "Tags",
+    icon: Tag,
+  },
+  {
+    name: "Delete",
+    icon: Trash2,
+  },
+];
+
 const TaskDropdownMenuContext = createContext(null);
 const useTaskDropdownMenu = () => useContext(TaskDropdownMenuContext);
 
@@ -136,32 +147,6 @@ const TaskDateOptions = () => {
   );
 };
 
-// const TaskPrioritiesOptions = () => {
-//   const { task } = useTaskDropdownMenu();
-//   const [value, setValue] = useState(task?.priority);
-
-//   return (
-//     <div className="w-full flex gap-3 items-center justify-between">
-//       {PRIORITIES.map((priority) => {
-//         const isSelected = value === priority.value;
-
-//         return (
-//           <IconButton
-//             variant={"ghost"}
-//             className={cn(isSelected && "bg-primary/5")}
-//             onClick={() => setValue(priority.value)}
-//           >
-//             <Flag
-//               size={16}
-//               className={cn(priority.color, priority.fillColor)}
-//             />
-//           </IconButton>
-//         );
-//       })}
-//     </div>
-//   );
-// };
-
 const TaskPrioritiesOptions = () => {
   const { task, setIsOpen } = useTaskDropdownMenu();
   const [value, setValue] = useState(task.priority);
@@ -207,48 +192,43 @@ const TaskPrioritiesOptions = () => {
   );
 };
 
-const TaskTagSelector = () => {
-  const { setIsOpen, setIsTagsOpen } = useTaskDropdownMenu();
+const TaskDropdownMenuOptions = () => {
+  const { task, setIsOpen, setIsTagsOpen } = useTaskDropdownMenu();
 
-  return (
-    <DropdownMenuItem asChild>
-      <Button
-        variant={"ghost"}
-        size={"full"}
-        onClick={(e) => {
-          setIsOpen(false);
-          setIsTagsOpen(true);
-        }}
-        className={"justify-start h-8"}
-      >
-        <Tag size={16} className="text-gray/40 mr-1.5" />
-        <span className="text-sm">Tags</span>
-      </Button>
-    </DropdownMenuItem>
-  );
-};
+  const handleTaskOption = (optionName) => {
+    switch (optionName) {
+      case "Tags": {
+        setIsOpen(false);
+        setIsTagsOpen(true);
+        break;
+      }
 
-const TaskDeleteBtn = () => {
-  const { task, setIsOpen } = useTaskDropdownMenu();
-
-  const handleDelete = () => {
-    console.log("Delete task", task._id);
-    setIsOpen(false);
+      case "Delete": {
+        console.log("Delete task", task._id);
+        setIsOpen(false);
+        break;
+      }
+    }
   };
 
-  return (
-    <DropdownMenuItem asChild>
-      <Button
-        variant={"destructive"}
-        size={"full"}
-        onClick={handleDelete}
-        className={"h-8 justify-start"}
-      >
-        <Trash2 size={16} className="mr-1.5" />
-        <span className="text-sm">Delete</span>
-      </Button>
-    </DropdownMenuItem>
-  );
+  return TASK_MENU_OPTIONS.map((option) => {
+    const IconComponent = option.icon;
+    const variant = option.name === "Delete" ? "destructive" : "ghost";
+
+    return (
+      <DropdownMenuItem key={option.name} asChild>
+        <Button
+          variant={variant}
+          size={"full"}
+          onClick={() => handleTaskOption(option.name)}
+          className={"h-8 justify-start"}
+        >
+          <IconComponent size={16} className="mr-1.5" />
+          <span className="text-sm">{option.name}</span>
+        </Button>
+      </DropdownMenuItem>
+    );
+  });
 };
 
 const TaskDropdownMenuContent = () => {
@@ -262,8 +242,7 @@ const TaskDropdownMenuContent = () => {
           <TaskDateOptions />
           <TaskPrioritiesOptions />
           <DropdownMenuSeparator />
-          <TaskTagSelector />
-          <TaskDeleteBtn />
+          <TaskDropdownMenuOptions />
         </DropdownMenuContent>
       )}
 
