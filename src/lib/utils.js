@@ -103,3 +103,13 @@ export const moveToMiddleSortOrder = ({ items, beforeItemId, afterItemId }) => {
 
   return (beforeSortOrder + afterSortOrder) / 2;
 };
+
+export const mergeRefs = (...refs) => {
+  return (node) => {
+    for (const ref of refs) {
+      if (ref !== null && ref !== undefined) {
+        ref.current = node;
+      }
+    }
+  };
+};
