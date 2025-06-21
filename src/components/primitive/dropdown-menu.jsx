@@ -1,5 +1,6 @@
 import {
   createContext,
+  forwardRef,
   useContext,
   useEffect,
   useLayoutEffect,
@@ -7,7 +8,7 @@ import {
   useState,
 } from "react";
 import { Slot } from "./slot";
-import { clampX, clampY, cn } from "@/lib/utils";
+import { clampX, clampY, cn, mergeRefs } from "@/lib/utils";
 import { createPortal } from "react-dom";
 import { GAP_BETWEEN_SCREEN } from "@/constants";
 
@@ -41,23 +42,25 @@ const DropdownMenu = ({ open, onOpenChange, children }) => {
   );
 };
 
-const DropdownMenuTrigger = ({ asChild = false, className, children }) => {
-  const { triggerRef, onOpenChange } = useDropdownMenu();
-  const Comp = asChild ? Slot : "button";
+const DropdownMenuTrigger = forwardRef(
+  ({ asChild = false, className, children }, ref) => {
+    const { triggerRef, onOpenChange } = useDropdownMenu();
+    const Comp = asChild ? Slot : "button";
 
-  return (
-    <Comp
-      className={cn(
-        "flex items-center justify-center whitespace-nowrap text-sm rounded-md transition-all",
-        className
-      )}
-      ref={triggerRef}
-      onClick={() => onOpenChange((prevState) => !prevState)}
-    >
-      {children}
-    </Comp>
-  );
-};
+    return (
+      <Comp
+        className={cn(
+          "flex items-center justify-center whitespace-nowrap text-sm rounded-md transition-all",
+          className
+        )}
+        ref={mergeRefs(triggerRef, ref)}
+        onClick={() => onOpenChange((prevState) => !prevState)}
+      >
+        {children}
+      </Comp>
+    );
+  }
+);
 
 const DropdownMenuContent = ({
   className,
@@ -396,7 +399,73 @@ const DropdownMenuLabel = ({ asChild = false, className, children }) => {
 
   return <Comp className={cn("text-sm text-gray", className)}>{children}</Comp>;
 };
+
+const DropdownMenuRadioGroupCtx = createContext(null);
+const useDropdownMenuRadio = () => useContext(DropdownMenuRadioGroupCtx);
+
+const DropdownMenuRadioGroup = ({
+  asChild = false,
+  value,
+  onValueChange,
+  className,
+  children,
+}) => {
+  const Comp = asChild ? Slot : "div";
+
+  const contextValue = {
+    value,
+    setValue: onValueChange,
+  };
+
+  return (
+    <DropdownMenuRadioGroupCtx.Provider value={contextValue}>
+      <Comp className={cn("flex items-center w-full", className)}>
+        {children}
+      </Comp>
+    </DropdownMenuRadioGroupCtx.Provider>
+  );
+};
+
+const DropdownMenuRadioItem = ({
+  value,
+  asChild = false,
+  className,
+  children,
+}) => {
+  const { onOpenChange } = useDropdownMenu();
+  const { setValue } = useDropdownMenuRadio();
+
+  const Comp = asChild ? Slot : "button";
+
+  const handleValue = () => {
+    setValue(value);
+    onOpenChange(false);
+  };
+
+  return (
+    <Comp
+      onClick={handleValue}
+      className={cn("w-full rounded-md text-sm text-gray", className)}
+    >
+      {children}
+    </Comp>
+  );
+};
 // TODO: later add sub content and grouping
+
+const DropdownMenuItemIndicator = ({
+  className,
+  asChild = false,
+  children,
+}) => {
+  const Comp = asChild ? Slot : "div";
+
+  return (
+    <Comp className={cn("flex items-center justify-center", className)}>
+      {children}
+    </Comp>
+  );
+};
 
 export {
   DropdownMenu,
@@ -405,4 +474,7 @@ export {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuLabel,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuItemIndicator,
 };
