@@ -73,7 +73,7 @@ const buttonVariants = cva(
         variant: "destructive",
         isDisabled: false,
         class:
-          "sm:hover:text-wran-red sm:hover:bg-wran-red/40 active:bg-wran-red/60",
+          "sm:hover:text-wran-red sm:hover:bg-wran-red/15 active:bg-wran-red/40",
       },
     ],
     defaultVariants: {
