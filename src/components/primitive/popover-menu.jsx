@@ -68,6 +68,7 @@ const PopoverMenuContent = ({
   align = "center",
   alignOffset = 0,
   handleReset = () => {},
+  anchorRef,
   children,
 }) => {
   const {
@@ -80,7 +81,7 @@ const PopoverMenuContent = ({
 
   useEffect(() => {
     const handleClickOutside = (e) => {
-      const trigger = triggerRef.current;
+      const trigger = anchorRef?.current || triggerRef.current;
       const content = contentRef.current;
 
       if (
@@ -103,7 +104,9 @@ const PopoverMenuContent = ({
 
   useLayoutEffect(() => {
     if (isOpen && contentRef.current) {
-      const triggerRect = triggerRef.current.getBoundingClientRect();
+      const triggerRect =
+        anchorRef?.current?.getBoundingClientRect() ||
+        triggerRef.current.getBoundingClientRect();
       const contentRect = contentRef.current.getBoundingClientRect();
       const windowWidth = window.innerWidth;
       const windowHeight = window.innerHeight;
