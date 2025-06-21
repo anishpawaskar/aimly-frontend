@@ -171,7 +171,10 @@ const TagSelectorTrigger = ({ asChild = false, className, children }) => {
     <PopoverMenuTrigger asChild={true}>
       <Comp
         onClick={() => setOpen((prevState) => !prevState)}
-        className={cn(buttonVariants({ variant: "ghost" }), className)}
+        className={cn(
+          buttonVariants({ variant: "ghost", isDisabled: false }),
+          className
+        )}
       >
         {children}
       </Comp>
@@ -338,6 +341,7 @@ const TagSelectorContent = ({
   alignOffset,
   className,
   handleTagSubmit,
+  anchorRef,
 }) => {
   const { open, tags, selectedTags, setSelectedTags, search, setSearch } =
     useTagSelector();
@@ -375,6 +379,7 @@ const TagSelectorContent = ({
         className
       )}
       handleReset={handleReset}
+      anchorRef={anchorRef}
     >
       <div className="flex flex-col gap-1.5">
         <TagSelectorHeader />
