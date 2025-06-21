@@ -1,4 +1,5 @@
 import { TaskForm } from "../forms/task-form";
+import { TasksList } from "./tasks-list";
 
 export const TasksListView = () => {
   return (
@@ -8,6 +9,7 @@ export const TasksListView = () => {
           <h3 className="text-lg font-semibold">Heelo World</h3>
         </div>
         <TaskForm />
+        <TasksList />
       </div>
     </div>
   );
