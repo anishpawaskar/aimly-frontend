@@ -10,9 +10,13 @@ import {
   DropdownMenuTrigger,
 } from "../primitive/dropdown-menu";
 import {
+  AlignJustify,
   CalendarArrowUp,
+  Check,
   Ellipsis,
   Flag,
+  FolderInput,
+  Search,
   Sun,
   Sunrise,
   Tag,
@@ -23,6 +27,8 @@ import { IconButton } from "../primitive/icon-button";
 import { cn } from "@/lib/utils";
 import { TagSelector, TagSelectorContent } from "../common/tag-selector";
 import { Button } from "../primitive/button";
+import { PopoverMenu, PopoverMenuContent } from "../primitive/popover-menu";
+import { Input } from "../primitive/input";
 
 const DATE_OPTIONS = [
   {
@@ -72,6 +78,10 @@ const TASK_MENU_OPTIONS = [
     icon: Tag,
   },
   {
+    name: "Move to",
+    icon: FolderInput,
+  },
+  {
     name: "Delete",
     icon: Trash2,
   },
@@ -84,6 +94,7 @@ const TaskDropdownMenu = ({ task, children }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isTagsOpen, setIsTagsOpen] = useState(false);
   const [tags, setTags] = useState(task.tags);
+  const [isMoveToProjectVisible, setIsMoveToProjectVisible] = useState(false);
 
   const anchorRef = useRef(null);
 
@@ -96,6 +107,8 @@ const TaskDropdownMenu = ({ task, children }) => {
     tags,
     setTags,
     anchorRef,
+    isMoveToProjectVisible,
+    setIsMoveToProjectVisible,
   };
 
   return (
@@ -193,13 +206,20 @@ const TaskPrioritiesOptions = () => {
 };
 
 const TaskDropdownMenuOptions = () => {
-  const { task, setIsOpen, setIsTagsOpen } = useTaskDropdownMenu();
+  const { task, setIsOpen, setIsTagsOpen, setIsMoveToProjectVisible } =
+    useTaskDropdownMenu();
 
   const handleTaskOption = (optionName) => {
     switch (optionName) {
       case "Tags": {
         setIsOpen(false);
         setIsTagsOpen(true);
+        break;
+      }
+
+      case "Move to": {
+        setIsOpen(false);
+        setIsMoveToProjectVisible(true);
         break;
       }
 
@@ -231,9 +251,89 @@ const TaskDropdownMenuOptions = () => {
   });
 };
 
-const TaskDropdownMenuContent = () => {
-  const { isOpen, isTagsOpen, setIsTagsOpen, tags, setTags, anchorRef } =
+const TaskMoveProjectSelector = () => {
+  const [search, setSearch] = useState("");
+
+  const { isMoveToProjectVisible, setIsMoveToProjectVisible, anchorRef } =
     useTaskDropdownMenu();
+
+  const handleMoveProject = (project) => {
+    console.log("move to project", project.name);
+    setIsMoveToProjectVisible(false);
+  };
+
+  return (
+    <PopoverMenu
+      open={isMoveToProjectVisible}
+      onOpenChange={setIsMoveToProjectVisible}
+    >
+      <PopoverMenuContent
+        sideOffset={0}
+        className={"w-48 min-w-[150px]"}
+        handleReset={() => {
+          setSearch("");
+        }}
+        anchorRef={anchorRef}
+      >
+        <div className="search-bar w-full flex items-center h-8 border-b border-gray/10 px-1">
+          <Search size={18} className="text-gray/40 shrink-0" />
+          <Input
+            placeholder={"Search"}
+            className={"border-none h-full flex-1 focus:border-none"}
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+        </div>
+        <ul className="h-[300px] overflow-y-auto flex flex-col">
+          {TASK_MENU_OPTIONS.map((project, idx) => {
+            const isSelected = idx === 1;
+
+            return (
+              <li key={idx}>
+                <Button
+                  variant={"ghost"}
+                  size={"full"}
+                  className={"h-8 px-2 justify-between"}
+                  onClick={() => handleMoveProject(project)}
+                >
+                  <span className="flex items-center flex-1 mr-0.5">
+                    <AlignJustify
+                      size={16}
+                      className={cn(
+                        "text-gray/40 shrink-0 mr-3",
+                        isSelected && "text-primary"
+                      )}
+                    />
+                    <span
+                      className={cn(
+                        "flex-1 text-xs text-gray truncate text-start",
+                        isSelected && "text-primary"
+                      )}
+                    >
+                      {project.name}
+                    </span>
+                  </span>
+                  {isSelected && <Check size={16} className="text-primary" />}
+                </Button>
+              </li>
+            );
+          })}
+        </ul>
+      </PopoverMenuContent>
+    </PopoverMenu>
+  );
+};
+
+const TaskDropdownMenuContent = () => {
+  const {
+    isOpen,
+    isTagsOpen,
+    setIsTagsOpen,
+    tags,
+    setTags,
+    anchorRef,
+    isMoveToProjectVisible,
+  } = useTaskDropdownMenu();
 
   return (
     <>
@@ -263,6 +363,7 @@ const TaskDropdownMenuContent = () => {
           />
         </TagSelector>
       )}
+      {isMoveToProjectVisible && <TaskMoveProjectSelector />}
     </>
   );
 };
