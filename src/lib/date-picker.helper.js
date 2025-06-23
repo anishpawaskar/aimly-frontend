@@ -125,3 +125,21 @@ export const isToday = (date) => {
     baseDateYear === dateYear
   );
 };
+
+export const isTomorrow = (date) => {
+  if (!isValidDate(date)) {
+    return false;
+  }
+
+  const today = new Date();
+  const tomorrow = new Date(today);
+  tomorrow.setDate(today.getDate() + 1);
+
+  const inputDate = new Date(date);
+
+  return (
+    inputDate.getDate() === tomorrow.getDate() &&
+    inputDate.getMonth() === tomorrow.getMonth() &&
+    inputDate.getFullYear() === tomorrow.getFullYear()
+  );
+};

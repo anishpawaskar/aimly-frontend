@@ -1,4 +1,4 @@
-import { clampX, cn } from "@/lib/utils";
+import { clampX, clampY, cn } from "@/lib/utils";
 import {
   createContext,
   useContext,
@@ -67,6 +67,8 @@ const PopoverMenuContent = ({
   sideOffset = 10,
   align = "center",
   alignOffset = 0,
+  handleReset = () => {},
+  anchorRef,
   children,
 }) => {
   const {
@@ -82,13 +84,18 @@ const PopoverMenuContent = ({
       const trigger = triggerRef.current;
       const content = contentRef.current;
 
-      if (
-        trigger &&
-        !trigger.contains(e.target) &&
-        content &&
-        !content.contains(e.target)
-      ) {
-        setIsOpen(false);
+      const clickOutSideContent = content && !content.contains(e.target);
+
+      if (!anchorRef) {
+        if (trigger && !trigger.contains(e.target) && clickOutSideContent) {
+          setIsOpen(false);
+          handleReset();
+        }
+      } else {
+        if (clickOutSideContent) {
+          setIsOpen(false);
+          handleReset();
+        }
       }
     };
 
@@ -101,7 +108,9 @@ const PopoverMenuContent = ({
 
   useLayoutEffect(() => {
     if (isOpen && contentRef.current) {
-      const triggerRect = triggerRef.current.getBoundingClientRect();
+      const triggerRect =
+        anchorRef?.current?.getBoundingClientRect() ||
+        triggerRef.current.getBoundingClientRect();
       const contentRect = contentRef.current.getBoundingClientRect();
       const windowWidth = window.innerWidth;
       const windowHeight = window.innerHeight;

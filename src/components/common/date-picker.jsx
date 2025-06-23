@@ -17,7 +17,14 @@ import {
   PopoverMenuTrigger,
 } from "../primitive/popover-menu";
 import { IconButton } from "../primitive/icon-button";
-import { useState } from "react";
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useInsertionEffect,
+  useRef,
+  useState,
+} from "react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../primitive/tooltip";
 import {
   CALENDAR_MONTHS,
@@ -34,6 +41,7 @@ import {
   getNextMonth,
   getPrevMonth,
   isToday,
+  isTomorrow,
 } from "@/lib/date-picker.helper";
 import { cn } from "@/lib/utils";
 
@@ -56,9 +64,164 @@ const DATE_OPTIONS = [
   },
 ];
 
-const DatePicker = ({ selectedDate, setSelectedDate }) => {
-  const [isOpen, setIsOpen] = useState(false);
-  const [calendarView, setCalendarView] = useState("date");
+const DatePickerContext = createContext(null);
+const useDatePicker = () => useContext(DatePickerContext);
+
+const DatePicker = ({ setDate, open, setOpen, date, children }) => {
+  // const [open, setOpen] = useState(false);
+  const [view, setView] = useState("days");
+  const [selectedDate, setSelectedDate] = useState(null);
+
+  const contextValue = {
+    open,
+    setOpen,
+    view,
+    setView,
+    selectedDate,
+    setSelectedDate,
+    date,
+    setDate,
+  };
+
+  return (
+    <DatePickerContext.Provider value={contextValue}>
+      <PopoverMenu open={open} onOpenChange={setOpen}>
+        {children}
+      </PopoverMenu>
+    </DatePickerContext.Provider>
+  );
+};
+
+const DatePickerTrigger = ({ className }) => {
+  const { selectedDate, date } = useDatePicker();
+  // console.log("trigger", date);
+  let datePlaceHolder;
+
+  if (selectedDate || date) {
+    const inputDate = selectedDate?.currentDate
+      ? new Date(selectedDate?.currentDate)
+      : new Date(date);
+
+    if (isTomorrow(inputDate)) {
+      datePlaceHolder = "Tomorrow";
+    } else {
+      let monthKey;
+      if (selectedDate?.month) {
+        monthKey =
+          Object.keys(CALENDAR_MONTHS)[selectedDate?.currentDate?.getMonth()];
+      } else {
+        monthKey = Object.keys(CALENDAR_MONTHS)[date?.getMonth()];
+      }
+
+      datePlaceHolder = `${
+        selectedDate?.currentDate?.getDate() || date?.getDate()
+      } ${CALENDAR_MONTHS[monthKey]}`;
+    }
+  }
+
+  return (
+    <PopoverMenuTrigger asChild={true}>
+      <IconButton
+        variant={"ghost"}
+        className={cn(
+          "border-none h-7 w-7 p-0",
+          (selectedDate || date) &&
+            "text-primary flex items-center gap-1 w-auto px-2",
+          className
+        )}
+      >
+        <CalendarDays
+          size={16}
+          className={cn(
+            "text-gray/40",
+            (selectedDate || date) && "text-primary"
+          )}
+        />
+        {(selectedDate || date) && (
+          <span className="text-xs text-primary">{datePlaceHolder}</span>
+        )}
+      </IconButton>
+    </PopoverMenuTrigger>
+  );
+};
+
+const DatePickerHeader = () => {
+  return (
+    <h3 className="text-lg text-gray font-semibold break-words text-center">
+      Date
+    </h3>
+  );
+};
+
+const DatePickerQuickDates = () => {
+  const { setSelectedDate, setOpen, setView, setDate } = useDatePicker();
+
+  const handleDateOption = (option) => {
+    const _date = new Date();
+    let currentDate;
+    let month;
+    let year;
+
+    switch (option) {
+      case "Today": {
+        currentDate = _date;
+        break;
+      }
+
+      case "Tomorrow": {
+        currentDate = new Date(_date.valueOf() + ONE_DAY_MS);
+        break;
+      }
+
+      case "Next Week": {
+        currentDate = new Date(_date.valueOf() + ONE_WEEK_MS);
+        break;
+      }
+
+      case "Next Month": {
+        currentDate = new Date(_date.valueOf() + ONE_MONTH_MS);
+        break;
+      }
+    }
+
+    month = currentDate.getMonth() + 1;
+    year = currentDate.getFullYear();
+
+    setSelectedDate({
+      currentDate,
+      month,
+      year,
+    });
+    setDate(currentDate);
+    setOpen(false);
+    setView("days");
+  };
+  return (
+    <ul className="w-full flex gap-3 items-center justify-between">
+      {DATE_OPTIONS.map((option) => {
+        const IconComponent = option.icon;
+
+        return (
+          <Tooltip key={option.label}>
+            <TooltipTrigger>
+              <IconButton
+                variant={"ghost"}
+                size={"sm"}
+                onClick={() => handleDateOption(option.label)}
+              >
+                <IconComponent size={20} />
+              </IconButton>
+            </TooltipTrigger>
+            <TooltipContent>{option.label}</TooltipContent>
+          </Tooltip>
+        );
+      })}
+    </ul>
+  );
+};
+
+const DatePickerControls = () => {
+  const { view, setView, selectedDate, setSelectedDate } = useDatePicker();
 
   const monthsKeys = Object.keys(CALENDAR_MONTHS);
 
@@ -67,9 +230,9 @@ const DatePicker = ({ selectedDate, setSelectedDate }) => {
     : CALENDAR_MONTHS[monthsKeys[THIS_MONTH - 1]];
   const currentYear = selectedDate?.year ? selectedDate?.year : THIS_YEAR;
 
-  const days = generateCalendar(selectedDate?.month, selectedDate?.year);
-  const totalDaysInWeek = Object.keys(WEEK_DAYS).length;
-  const totalMonthsInYear = Object.keys(CALENDAR_MONTHS).length;
+  const toggleCalendarView = () => {
+    setView((prevState) => (prevState === "days" ? "months" : "days"));
+  };
 
   const handlePrevMonth = () => {
     const { month, year } = getPrevMonth(
@@ -79,7 +242,7 @@ const DatePicker = ({ selectedDate, setSelectedDate }) => {
 
     const payload = {};
 
-    if (calendarView === "date") {
+    if (view === "days") {
       payload.month = month;
       payload.year = year;
     } else {
@@ -90,7 +253,7 @@ const DatePicker = ({ selectedDate, setSelectedDate }) => {
   };
 
   const handleCurrentMonth = () => {
-    if (calendarView !== "date") return;
+    if (view !== "days") return;
     setSelectedDate((prevState) => ({
       ...prevState,
       month: THIS_MONTH,
@@ -106,7 +269,7 @@ const DatePicker = ({ selectedDate, setSelectedDate }) => {
 
     const payload = {};
 
-    if (calendarView === "date") {
+    if (view === "days") {
       payload.month = month;
       payload.year = year;
     } else {
@@ -116,299 +279,250 @@ const DatePicker = ({ selectedDate, setSelectedDate }) => {
     setSelectedDate((prevState) => ({ ...prevState, ...payload }));
   };
 
-  const toggleCalendarView = () => {
-    setCalendarView((prevState) => (prevState === "date" ? "month" : "date"));
-  };
-
-  const handleClear = () => {
-    setCalendarView("date");
-    setSelectedDate(null);
-    setIsOpen(false);
-  };
-
   return (
-    <PopoverMenu open={isOpen} onOpenChange={setIsOpen}>
-      <PopoverMenuTrigger asChild>
-        <IconButton variant={"ghost"} className={"border-none h-7 w-7 p-0"}>
-          <CalendarDays size={16} className="text-gray/40" />
+    <div className="date-picker-controls flex items-center justify-between gap-2.5">
+      <button
+        onClick={toggleCalendarView}
+        className="text-sm w-[70%] text-gray/80 text-start pl-1.5"
+      >
+        {view === "days" && (
+          <span className="current-month mr-[2px]">{currentMonth}</span>
+        )}
+        <span className="current-year">{currentYear}</span>
+      </button>
+      <div className="w-[30%] flex items-center gap-0.5">
+        <IconButton variant={"ghost"} size={"xs"} onClick={handlePrevMonth}>
+          <ChevronLeft size={16} className="text-gray/40" />
         </IconButton>
-      </PopoverMenuTrigger>
-      <PopoverMenuContent className={"w-64"}>
-        <div>
-          <h3 className="text-lg text-gray font-semibold break-words text-center">
-            Date
-          </h3>
-          <ul className="w-full flex gap-3 items-center justify-between">
-            {DATE_OPTIONS.map((dateOption) => {
-              const IconComponent = dateOption.icon;
-
-              const handleDateOptiom = (option) => {
-                const currentDate = new Date();
-
-                switch (option) {
-                  case "Today": {
-                    const currentMonth = THIS_MONTH;
-                    const currentYear = THIS_YEAR;
-
-                    setSelectedDate({
-                      currentDate: currentDate,
-                      month: currentMonth,
-                      year: currentYear,
-                    });
-                    break;
-                  }
-
-                  case "Tomorrow": {
-                    const tomorrowDate = new Date(
-                      currentDate.valueOf() + ONE_DAY_MS
-                    );
-                    const tomorrowDateMonth = tomorrowDate.getMonth() + 1;
-                    const tomorrowDateYear = tomorrowDate.getFullYear();
-
-                    setSelectedDate({
-                      currentDate: tomorrowDate,
-                      month: tomorrowDateMonth,
-                      year: tomorrowDateYear,
-                    });
-                    break;
-                  }
-
-                  case "Next Week": {
-                    const nextWeekDate = new Date(
-                      currentDate.valueOf() + ONE_WEEK_MS
-                    );
-                    const nextWeekMonth = nextWeekDate.getMonth() + 1;
-                    const nextWeekYear = nextWeekDate.getFullYear();
-
-                    setSelectedDate({
-                      currentDate: nextWeekDate,
-                      month: nextWeekMonth,
-                      year: nextWeekYear,
-                    });
-                    break;
-                  }
-
-                  case "Next Month": {
-                    const nextMonthDate = new Date(
-                      currentDate.valueOf() + ONE_MONTH_MS
-                    );
-                    const nextMonth_Month = nextMonthDate.getMonth() + 1;
-                    const nextMonth_Year = nextMonthDate.getFullYear();
-
-                    setSelectedDate({
-                      currentDate: nextMonthDate,
-                      month: nextMonth_Month,
-                      year: nextMonth_Year,
-                    });
-                    break;
-                  }
-                }
-              };
-
-              return (
-                <Tooltip key={dateOption.label}>
-                  <TooltipTrigger>
-                    <IconButton
-                      variant={"ghost"}
-                      size={"sm"}
-                      onClick={() => handleDateOptiom(dateOption.label)}
-                    >
-                      <IconComponent size={20} />
-                    </IconButton>
-                  </TooltipTrigger>
-                  <TooltipContent>{dateOption.label}</TooltipContent>
-                </Tooltip>
-              );
-            })}
-          </ul>
-          <div className="calendar-wrapper">
-            <div className="calendar-header flex items-center justify-between gap-2.5">
-              <button
-                className={"text-sm w-[70%] text-gray/80 text-start pl-1.5"}
-                onClick={toggleCalendarView}
-              >
-                {calendarView === "date" && (
-                  <span className="current-month mr-[2px]">{currentMonth}</span>
-                )}
-                <span className="current-year">{currentYear}</span>
-              </button>
-              <div className="w-[30%] flex items-center gap-0.5">
-                <IconButton
-                  variant={"ghost"}
-                  size={"xs"}
-                  onClick={handlePrevMonth}
-                >
-                  <ChevronLeft size={16} className="text-gray/40" />
-                </IconButton>
-                <button
-                  onClick={handleCurrentMonth}
-                  className="h-6 w-6 flex items-center justify-center rounded-md"
-                >
-                  <Circle size={10} className="text-gray/40" />
-                </button>
-                <IconButton
-                  variant={"ghost"}
-                  size={"xs"}
-                  onClick={handleNextMonth}
-                >
-                  <ChevronRight size={16} className="text-gray/40" />
-                </IconButton>
-              </div>
-            </div>
-            <div className="calendar-body">
-              {calendarView === "month" && (
-                <ul className="flex flex-col">
-                  {[...new Array(totalMonthsInYear / 4)].map((_, idx) => {
-                    return (
-                      <li
-                        key={idx}
-                        className="flex items-center justify-between"
-                      >
-                        {Object.keys(CALENDAR_MONTHS)
-                          .slice(
-                            idx * (totalMonthsInYear / 3),
-                            (idx + 1) * (totalMonthsInYear / 3)
-                          )
-                          .map((month) => {
-                            const monthIdx =
-                              Object.keys(CALENDAR_MONTHS).indexOf(month) + 1;
-
-                            const isSelected = selectedDate?.month
-                              ? selectedDate?.month === monthIdx
-                              : THIS_MONTH === monthIdx;
-
-                            const handleMonth = () => {
-                              setSelectedDate((prevState) => ({
-                                ...prevState,
-                                month: monthIdx,
-                              }));
-                              setCalendarView("date");
-                            };
-
-                            return (
-                              <button
-                                key={month}
-                                onClick={handleMonth}
-                                className={cn(
-                                  "h-8 w-8 rounded-full flex items-center justify-center text-gray text-[13px] leading-[32px]",
-                                  isSelected &&
-                                    "bg-primary text-primary-foreground",
-                                  !isSelected && "sm:hover:bg-primary/20"
-                                )}
-                              >
-                                {CALENDAR_MONTHS[month]}
-                              </button>
-                            );
-                          })}
-                      </li>
-                    );
-                  })}
-                </ul>
-              )}
-              {calendarView === "date" && (
-                <ul className="flex flex-col">
-                  <li className="calendar-weeks flex items-center justify-between text-xs">
-                    {Object.keys(WEEK_DAYS).map((day) => {
-                      return (
-                        <span
-                          key={day}
-                          className="h-7 w-7 flex items-center justify-center text-gray/40 text-center"
-                        >
-                          {WEEK_DAYS[day][0]}
-                        </span>
-                      );
-                    })}
-                  </li>
-                  {[...new Array(CALENDAR_WEEKS)].map((_, idx) => {
-                    return (
-                      <li
-                        key={idx}
-                        className="flex items-center justify-between text-xs"
-                      >
-                        {days
-                          .slice(
-                            idx * totalDaysInWeek,
-                            (idx + 1) * totalDaysInWeek
-                          )
-                          .map((date) => {
-                            const _date = new Date(date.join("-"));
-                            const _isToday = isToday(_date);
-                            const isCurrentMonth = selectedDate?.month
-                              ? date[1] === selectedDate?.month
-                              : date[1] === THIS_MONTH;
-
-                            let isSelectedDate = false;
-
-                            if (selectedDate?.currentDate) {
-                              const _date = new Date(selectedDate?.currentDate);
-                              const date_date = _date.getDate();
-                              const dateMonth = _date.getMonth() + 1;
-                              const dateYear = _date.getFullYear();
-
-                              isSelectedDate =
-                                date_date === date[date.length - 1] &&
-                                dateMonth === date[1] &&
-                                dateYear === date[0];
-                            }
-
-                            const handleDate = () => {
-                              const _date = new Date(date.join("-"));
-                              const month = _date.getMonth() + 1;
-                              const year = _date.getFullYear();
-
-                              setSelectedDate((prevState) => ({
-                                ...prevState,
-                                currentDate: _date,
-                                month,
-                                year,
-                              }));
-                            };
-
-                            return (
-                              <button
-                                key={date.join("-")}
-                                className={cn(
-                                  "h-7 w-7 flex items-center justify-center text-center rounded-full transition-colors",
-                                  _isToday && "text-primary bg-primary/10",
-                                  !isCurrentMonth && "text-gray/40",
-                                  isSelectedDate &&
-                                    "bg-primary text-primary-foreground",
-                                  !_isToday &&
-                                    !isSelectedDate &&
-                                    "sm:hover:bg-cancel-btn-hover sm:active:bg-cancel-btn-active"
-                                )}
-                                onClick={handleDate}
-                              >
-                                {date[date.length - 1]}
-                              </button>
-                            );
-                          })}
-                      </li>
-                    );
-                  })}
-                </ul>
-              )}
-            </div>
-          </div>
-        </div>
-        <PopoverMenuFooter>
-          <PopoverMenuCancel className={"h-8 w-full"} asChild>
-            <button onClick={handleClear}>Cancel</button>
-          </PopoverMenuCancel>
-          <PopoverMenuAction asChild>
-            <button
-              onClick={() => {
-                setIsOpen(false);
-              }}
-              className="h-8 w-full"
-            >
-              Ok
-            </button>
-          </PopoverMenuAction>
-        </PopoverMenuFooter>
-      </PopoverMenuContent>
-    </PopoverMenu>
+        <button
+          onClick={handleCurrentMonth}
+          className="h-6 w-6 flex items-center justify-center rounded-md"
+        >
+          <Circle size={10} className="text-gray/40" />
+        </button>
+        <IconButton variant={"ghost"} size={"xs"} onClick={handleNextMonth}>
+          <ChevronRight size={16} className="text-gray/40" />
+        </IconButton>
+      </div>
+    </div>
   );
 };
 
-export default DatePicker;
+const DatePickerDaysView = () => {
+  const { selectedDate, setSelectedDate } = useDatePicker();
+  const days = generateCalendar(selectedDate?.month, selectedDate?.year);
+  const totalDaysInWeek = Object.keys(WEEK_DAYS).length;
+
+  const handleDate = (date) => {
+    const _date = new Date(date.join("-"));
+    const month = _date.getMonth() + 1;
+    const year = _date.getFullYear();
+
+    setSelectedDate((prevState) => ({
+      ...prevState,
+      currentDate: _date,
+      month,
+      year,
+    }));
+  };
+
+  return (
+    <ul className="flex flex-col">
+      <li className="calendar-weeks flex items-center justify-between text-xs">
+        {Object.keys(WEEK_DAYS).map((day) => {
+          return (
+            <span
+              key={day}
+              className="h-7 w-7 flex items-center justify-center text-gray/40 text-center"
+            >
+              {WEEK_DAYS[day][0]}
+            </span>
+          );
+        })}
+      </li>
+      {[...new Array(CALENDAR_WEEKS)].map((_, idx) => {
+        return (
+          <li key={idx} className="flex items-center justify-between text-xs">
+            {days
+              .slice(idx * totalDaysInWeek, (idx + 1) * totalDaysInWeek)
+              .map((date) => {
+                const _date = new Date(date.join("-"));
+                const _isToday = isToday(_date);
+                const isCurrentMonth = selectedDate?.month
+                  ? date[1] === selectedDate?.month
+                  : date[1] === THIS_MONTH;
+
+                let isSelectedDate = false;
+
+                if (selectedDate?.currentDate) {
+                  const _date = new Date(selectedDate?.currentDate);
+                  const date_date = _date.getDate();
+                  const dateMonth = _date.getMonth() + 1;
+                  const dateYear = _date.getFullYear();
+
+                  isSelectedDate =
+                    date_date === date[date.length - 1] &&
+                    dateMonth === date[1] &&
+                    dateYear === date[0];
+                }
+
+                return (
+                  <button
+                    key={date.join("-")}
+                    className={cn(
+                      "h-7 w-7 flex items-center justify-center text-center rounded-full transition-colors",
+                      _isToday && "text-primary bg-primary/10",
+                      !isCurrentMonth && "text-gray/40",
+                      isSelectedDate && "bg-primary text-primary-foreground",
+                      !_isToday &&
+                        !isSelectedDate &&
+                        "sm:hover:bg-cancel-btn-hover sm:active:bg-cancel-btn-active"
+                    )}
+                    onClick={() => handleDate(date)}
+                  >
+                    {date[date.length - 1]}
+                  </button>
+                );
+              })}
+          </li>
+        );
+      })}
+    </ul>
+  );
+};
+
+const DatePickerMonthsView = () => {
+  const { selectedDate, setSelectedDate, setView } = useDatePicker();
+  const totalMonthsInYear = Object.keys(CALENDAR_MONTHS).length;
+
+  const handleMonth = (month) => {
+    setSelectedDate((prevState) => ({ ...prevState, month }));
+    setView("days");
+  };
+
+  return (
+    <ul className="flex flex-col">
+      {[...new Array(totalMonthsInYear / 4)].map((_, idx) => {
+        return (
+          <li key={idx} className="flex items-center justify-between">
+            {Object.keys(CALENDAR_MONTHS)
+              .slice(
+                idx * (totalMonthsInYear / 3),
+                (idx + 1) * (totalMonthsInYear / 3)
+              )
+              .map((month) => {
+                const monthIdx =
+                  Object.keys(CALENDAR_MONTHS).indexOf(month) + 1;
+
+                const isSelected = selectedDate?.month
+                  ? selectedDate?.month === monthIdx
+                  : THIS_MONTH === monthIdx;
+
+                return (
+                  <button
+                    key={month}
+                    onClick={() => handleMonth(monthIdx)}
+                    className={cn(
+                      "h-8 w-8 rounded-full flex items-center justify-center text-gray text-[13px] leading-[32px]",
+                      isSelected && "bg-primary text-primary-foreground",
+                      !isSelected && "sm:hover:bg-primary/20"
+                    )}
+                  >
+                    {CALENDAR_MONTHS[month]}
+                  </button>
+                );
+              })}
+          </li>
+        );
+      })}
+    </ul>
+  );
+};
+
+const DatePickerCalendar = () => {
+  const { view } = useDatePicker();
+
+  return (
+    <div className="calendar">
+      <DatePickerControls />
+      {view === "days" ? <DatePickerDaysView /> : <DatePickerMonthsView />}
+    </div>
+  );
+};
+
+const DatePickerFooter = ({ clearState, onSelect }) => {
+  const { setView, setOpen, selectedDate, setSelectedDate } = useDatePicker();
+
+  const handleCancel = () => {
+    setSelectedDate(null);
+    setView("days");
+    setOpen(false);
+    if (clearState) {
+      clearState();
+    }
+  };
+
+  const handleSubmit = () => {
+    onSelect(selectedDate?.currentDate ?? null);
+  };
+
+  return (
+    <PopoverMenuFooter>
+      <PopoverMenuCancel className={"h-8 w-full"} asChild>
+        <button onClick={handleCancel}>Cancel</button>
+      </PopoverMenuCancel>
+      <PopoverMenuAction asChild>
+        <button className="h-8 w-full" onClick={handleSubmit}>
+          Ok
+        </button>
+      </PopoverMenuAction>
+    </PopoverMenuFooter>
+  );
+};
+
+const DatePickerContent = ({
+  className,
+  side,
+  sideOffset,
+  align,
+  alignOffset,
+  clearState,
+  onSelect,
+}) => {
+  const { open, date, setSelectedDate, setView } = useDatePicker();
+
+  const handleClick = () => {
+    if (!date) {
+      setSelectedDate(null);
+    } else {
+      setSelectedDate({
+        currentDate: date,
+        month: date.getMonth() + 1,
+        year: date.getFullYear(),
+      });
+    }
+    setView("days");
+  };
+
+  if (!open) {
+    return null;
+  }
+
+  return (
+    <PopoverMenuContent
+      side={side}
+      sideOffset={sideOffset}
+      align={align}
+      alignOffset={alignOffset}
+      className={className}
+      handleReset={handleClick}
+    >
+      {/* <DatePickerHeader /> */}
+      <DatePickerQuickDates />
+      <DatePickerCalendar />
+      <DatePickerFooter clearState={clearState} onSelect={onSelect} />
+    </PopoverMenuContent>
+  );
+};
+
+export { DatePicker, DatePickerTrigger, DatePickerContent };
