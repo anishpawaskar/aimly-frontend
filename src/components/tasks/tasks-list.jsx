@@ -53,7 +53,7 @@ export const TasksList = () => {
                         }}
                         to={`/tags/${tag._id}/tasks`}
                         key={tag._id}
-                        className="text-xs h-[18px] flex justify-center items-center max-w-[88px] rounded-full truncate text-gray/60 px-2 break-all"
+                        className="text-xs h-5 flex justify-center items-center max-w-[88px] rounded-full truncate text-gray/60 px-2 break-all"
                       >
                         {tag.name}
                       </Link>
