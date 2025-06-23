@@ -13,6 +13,7 @@ import {
 import { ExpandableTextarea } from "../common/expandable-textarea";
 import { TASKS_DATA } from "../tasks/tasks.constant";
 import { Link } from "react-router";
+import { TagSelect } from "../tasks/tags/tag-select";
 
 export const UpdateTaskForm = () => {
   const [formData, setFormData] = useState({
@@ -115,6 +116,7 @@ export const UpdateTaskForm = () => {
                 </Link>
               );
             })}
+            <TagSelect taskId={task._id} tags={task.tags} />
           </div>
         )}
       </div>
