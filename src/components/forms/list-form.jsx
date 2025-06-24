@@ -83,7 +83,7 @@ const ListForm = ({ data, onOpenChange }) => {
     let sortOrder;
 
     if (projects.length) {
-      sortOrder = generateSortOrder({ projects });
+      sortOrder = generateSortOrder({ items: projects });
     } else {
       sortOrder = -BASE_INTERVAL;
     }

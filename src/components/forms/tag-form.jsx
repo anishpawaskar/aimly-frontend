@@ -53,7 +53,7 @@ const TagForm = ({ data, onOpenChange }) => {
     let sortOrder;
 
     if (tags.length) {
-      sortOrder = generateSortOrder({ tags });
+      sortOrder = generateSortOrder({ items: tags });
     } else {
       sortOrder = -BASE_INTERVAL;
     }
