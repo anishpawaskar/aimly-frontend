@@ -12,7 +12,8 @@ import { Button } from "../primitive/button";
 import { BASE_INTERVAL } from "@/constants";
 import { generateSortOrder } from "@/lib/utils";
 import { v4 as uuidV4 } from "uuid";
-import { useTasksSidenav } from "@/context/tasks-sidenav-provider";
+// import { useTasksSidenav } from "@/context/tasks-sidenav-provider";
+import { useTaskPage } from "@/context/task-page-provider";
 
 const TagForm = ({ data, onOpenChange }) => {
   const [formData, setFormData] = useState({
@@ -23,7 +24,8 @@ const TagForm = ({ data, onOpenChange }) => {
     serverError: "",
   });
 
-  const { items, setItems } = useTasksSidenav();
+  // const { items, setItems } = useTasksSidenav();
+  const { tags, setTags } = useTaskPage();
 
   const resetState = () => {
     setFormData({
@@ -50,15 +52,15 @@ const TagForm = ({ data, onOpenChange }) => {
   const handleSubmit = () => {
     let sortOrder;
 
-    if (items.length) {
-      sortOrder = generateSortOrder({ items });
+    if (tags.length) {
+      sortOrder = generateSortOrder({ tags });
     } else {
       sortOrder = -BASE_INTERVAL;
     }
 
     formData._id = uuidV4();
     formData.sortOrder = sortOrder;
-    setItems((prevItems) => [...prevItems, formData]);
+    setTags((prevItems) => [...prevItems, formData]);
     resetState();
     onOpenChange(false);
   };

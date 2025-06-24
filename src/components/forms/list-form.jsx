@@ -20,7 +20,8 @@ import { ColorPicker } from "../common/color-picker";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../primitive/tooltip";
 import { BASE_INTERVAL } from "@/constants";
 import { v4 as uuidV4 } from "uuid";
-import { useTasksSidenav } from "@/context/tasks-sidenav-provider";
+// import { useTasksSidenav } from "@/context/tasks-sidenav-provider";
+import { useTaskPage } from "@/context/task-page-provider";
 
 const PROJECT_VIEW_TYPE = [
   {
@@ -51,7 +52,8 @@ const ListForm = ({ data, onOpenChange }) => {
   });
   const [isInputFocus, setIsInputFocus] = useState(false);
 
-  const { items, setItems } = useTasksSidenav();
+  // const { items, setItems } = useTasksSidenav();
+  const { projects, setProjects } = useTaskPage();
 
   const nameInputRef = useRef(null);
 
@@ -80,15 +82,15 @@ const ListForm = ({ data, onOpenChange }) => {
   const handleSubmit = () => {
     let sortOrder;
 
-    if (items.length) {
-      sortOrder = generateSortOrder({ items });
+    if (projects.length) {
+      sortOrder = generateSortOrder({ projects });
     } else {
       sortOrder = -BASE_INTERVAL;
     }
 
     formData._id = uuidV4();
     formData.sortOrder = sortOrder;
-    setItems((prevItems) => [...prevItems, formData]);
+    setProjects((prevItems) => [...prevItems, formData]);
     resetState();
     onOpenChange(false);
   };

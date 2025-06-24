@@ -44,9 +44,10 @@ export const TasksSidenav = () => {
       <Accordion type="multiple" className={"p-0"}>
         {SIDENAV_ACCORDION_ITEMS.map((item) => {
           return (
-            <TasksSidenavProvider key={item.title}>
-              <TasksSidenavAccordionItem item={item} />
-            </TasksSidenavProvider>
+            // <TasksSidenavProvider key={item.title}>
+            //   <TasksSidenavAccordionItem item={item} />
+            // </TasksSidenavProvider>
+            <TasksSidenavAccordionItem key={item.title} item={item} />
           );
         })}
       </Accordion>

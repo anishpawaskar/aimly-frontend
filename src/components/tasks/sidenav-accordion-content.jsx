@@ -9,9 +9,15 @@ import {
   moveToTopSortOrder,
 } from "@/lib/utils";
 import { useRef } from "react";
+import { useTaskPage } from "@/context/task-page-provider";
 
 export const SidenavAccordionContent = ({ item }) => {
-  const { items, setItems } = useTasksSidenav();
+  // const { items, setItems } = useTasksSidenav();
+  const { projects, setProjects, tags, setTags } = useTaskPage();
+
+  const items = item.value === "lists" ? projects : tags;
+  const setItems = item.value === "lists" ? setProjects : setTags;
+
   const data = [...items];
   const SidenavDropdownMenu = item.dropdownMenu;
 
