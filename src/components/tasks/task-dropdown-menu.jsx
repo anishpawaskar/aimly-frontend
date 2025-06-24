@@ -197,6 +197,7 @@ const TaskDateOptions = () => {
 const TaskPrioritiesOptions = () => {
   const { task, setIsOpen } = useTaskDropdownMenu();
   const { tasks, setTasks } = useTaskPage();
+  const [value, setValue] = useState(task.priority);
 
   const handlePriority = (priority) => {
     const updatedTasks = tasks.map((taskItem) =>
