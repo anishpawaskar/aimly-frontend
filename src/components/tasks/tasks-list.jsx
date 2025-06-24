@@ -26,7 +26,9 @@ export const TasksList = () => {
 
   if (isProjectsPage) {
     data = tasks
-      .filter((task) => task.projectId === params?.projectId)
+      .filter(
+        (task) => task.projectId === params?.projectId && task.status === 1
+      )
       .map((task) => {
         const tags = task.tags.map((tagId) => {
           const existingTag = tags.find((tag) => tag._id === tagId);
@@ -46,7 +48,7 @@ export const TasksList = () => {
       .sort((a, b) => a.sortOrder - b.sortOrder);
   } else {
     data = tasks
-      .filter((task) => task.tags.includes(params?.tagId))
+      .filter((task) => task.tags.includes(params?.tagId) && task.status === 1)
       .map((task) => {
         const tags = task.tags.map((tagId) => {
           const existingTag = tags.find((tag) => tag._id === tagId);
