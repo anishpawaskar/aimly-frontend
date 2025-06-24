@@ -164,7 +164,7 @@ export const UpdateTaskForm = () => {
             </div>
           )}
         </div>
-        <div className="update-task-form-footer shrink-0 flex items-center justify-between border-t border-gray/10 pl-3 pr-5 py-2.5">
+        <div className="update-task-form-footer shrink-0 flex items-center justify-between pl-3 pr-5 py-2.5">
           <div className="footer-action-left flex items-center justify-center">
             <PopoverMenu
               open={isProjectsVisible}
