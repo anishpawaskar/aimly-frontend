@@ -1,4 +1,4 @@
-import { cn } from "@/lib/utils";
+import { cn, generateSortOrder } from "@/lib/utils";
 import { useState } from "react";
 import { ExpandableTextarea } from "../common/expandable-textarea";
 import {
@@ -18,6 +18,10 @@ import {
   TagSelectorTrigger,
 } from "../common/tag-selector";
 import { Tag } from "lucide-react";
+import { useParams } from "react-router";
+import { useTaskPage } from "@/context/task-page-provider";
+import { BASE_INTERVAL } from "@/constants";
+import { v4 as uuidv4 } from "uuid";
 
 export const TaskForm = () => {
   const [formData, setFormData] = useState({
@@ -31,6 +35,9 @@ export const TaskForm = () => {
   const [isTagsOpen, setIsTagsOpen] = useState(false);
   const [tags, setTags] = useState([]);
 
+  const { projectId } = useParams();
+  const { tasks, setTasks } = useTaskPage();
+
   const isAddBtnDisabled = formData.title === "" && formData.content === "";
 
   const handleOnChange = (e) => {
@@ -40,7 +47,32 @@ export const TaskForm = () => {
   };
 
   const handleSubmit = () => {
-    console.log("submit form");
+    const payload = {
+      _id: uuidv4(),
+      title: formData.title,
+      content: formData.content,
+      priority,
+      status: 0,
+      dueDate: date,
+      tags: tags.map((tag) => tag._id),
+      projectId,
+    };
+
+    if (tasks.length) {
+      payload.sortOrder = generateSortOrder({ items: tasks });
+    } else {
+      payload.sortOrder = -BASE_INTERVAL;
+    }
+
+    setTasks((prevTasks) => [...prevTasks, payload]);
+    setFormData({
+      title: "",
+      content: "",
+    });
+    setDate(null);
+    setPriority(0);
+    setTags([]);
+    // console.log("submit form");
   };
 
   return (
