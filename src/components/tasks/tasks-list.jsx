@@ -1,6 +1,6 @@
 import { Link, useLocation, useParams } from "react-router";
 import { Square, SquareCheck } from "lucide-react";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import {
   DatePicker,
   DatePickerContent,
@@ -12,6 +12,11 @@ import {
   TaskDropdownMenuTrigger,
 } from "./task-dropdown-menu";
 import { useTaskPage } from "@/context/task-page-provider";
+import {
+  moveToBottomSortOrder,
+  moveToMiddleSortOrder,
+  moveToTopSortOrder,
+} from "@/lib/utils";
 
 const PRIORITIES = [
   {
@@ -41,16 +46,71 @@ const PRIORITIES = [
 ];
 
 export const TasksList = () => {
-  const { tasks } = useTaskPage();
+  const { tasks, setTasks } = useTaskPage();
 
-  const location = useLocation();
   const params = useParams();
 
-  const isProjectsPage = location.pathname.includes("projects");
+  const dragItemRef = useRef(null);
+  const dragOverItemRef = useRef(null);
+
+  const handleDragStart = (e) => {
+    dragItemRef.current = e.currentTarget?.id;
+  };
+
+  const handleDragEnter = (e) => {
+    e.stopPropagation();
+    dragOverItemRef.current = e.currentTarget?.id;
+  };
+
+  const handleDrop = () => {
+    const sortedTasks = [...tasks].sort((a, b) => a.sortOrder - b.sortOrder);
+
+    const beforeItemIndex = sortedTasks.findIndex(
+      (task) => task._id === dragOverItemRef.current
+    );
+
+    if (dragItemRef.current === dragOverItemRef.current) {
+      return;
+    }
+
+    const beforeItem = sortedTasks.at(beforeItemIndex);
+    const afterItem = sortedTasks.at(beforeItemIndex + 1);
+
+    let newSortOrder;
+
+    if (!afterItem) {
+      newSortOrder = moveToBottomSortOrder({
+        itemId: dragItemRef.current,
+        items: tasks,
+      });
+    }
+
+    if (beforeItem && afterItem) {
+      newSortOrder = moveToMiddleSortOrder({
+        items: tasks,
+        beforeItemId: beforeItem._id,
+        afterItemId: afterItem._id,
+      });
+    }
+
+    if (tasks.length > 0 && beforeItemIndex === 0) {
+      newSortOrder = moveToTopSortOrder({ items: tasks });
+    }
+
+    const updatedTaks = tasks.map((task) =>
+      task._id === dragItemRef.current
+        ? { ...task, sortOrder: newSortOrder }
+        : task
+    );
+
+    setTasks(updatedTaks);
+    dragItemRef.current = null;
+    dragOverItemRef.current = null;
+  };
 
   let data;
 
-  if (isProjectsPage) {
+  if (params?.projectId) {
     data = tasks
       .filter(
         (task) => task.projectId === params?.projectId && task.status === 0
@@ -72,7 +132,9 @@ export const TasksList = () => {
         };
       })
       .sort((a, b) => a.sortOrder - b.sortOrder);
-  } else {
+  }
+
+  if (params?.tagId) {
     data = tasks
       .filter((task) => task.tags.includes(params?.tagId) && task.status === 0)
       .map((task) => {
@@ -99,15 +161,28 @@ export const TasksList = () => {
       <h3 className="text-2xl font-semibold">No tasks</h3>
     </div>
   ) : (
-    <ul className="tasks-list overflow-y-auto">
+    <ul
+      onDragOver={(e) => {
+        e.preventDefault();
+      }}
+      onDrop={handleDrop}
+      className="tasks-list overflow-y-auto"
+    >
       {data.map((task) => {
-        return <TaskListItem key={task._id} task={task} />;
+        return (
+          <TaskListItem
+            key={task._id}
+            task={task}
+            handleDragStart={handleDragStart}
+            handleDragEnter={handleDragEnter}
+          />
+        );
       })}
     </ul>
   );
 };
 
-const TaskListItem = ({ task }) => {
+const TaskListItem = ({ task, handleDragStart, handleDragEnter }) => {
   const [date, setDate] = useState(
     task.dueDate ? new Date(task.dueDate) : null
   );
@@ -133,7 +208,11 @@ const TaskListItem = ({ task }) => {
 
   return (
     <li
+      id={task._id}
       key={task._id}
+      draggable
+      onDragStart={handleDragStart}
+      onDragEnter={handleDragEnter}
       className="h-9 px-3 flex items-center gap-4 rounded-md hover:bg-cancel-btn-hover transition-colors group"
     >
       <Link
