@@ -357,8 +357,6 @@ const TagSelectorContent = ({
     tag.name.toLowerCase().includes(search.toLowerCase())
   );
 
-  console.log("filterted", filteredTags);
-
   const handleReset = () => {
     if (!tags.length) {
       setSelectedTags([]);
