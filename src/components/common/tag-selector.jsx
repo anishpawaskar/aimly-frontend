@@ -227,6 +227,7 @@ const TagSelectorHeader = () => {
           {selectedTags.map((selectedTag) => {
             return (
               <button
+                key={selectedTag._id}
                 onClick={() => handleCancelTag(selectedTag)}
                 className="max-w-32 truncate text-xs bg-primary/10 text-primary pl-1 pr-0.5 h-5 rounded-sm flex items-center gap-1 group"
               >
@@ -352,9 +353,11 @@ const TagSelectorContent = ({
 
   const { tags: taskPageTags, setTags, tasks, setTasks } = useTaskPage();
 
-  const filteredTags = TAGS.filter((tag) =>
-    search ? tag.name.toLowerCase().includes(search.toLowerCase()) : true
+  const filteredTags = taskPageTags.filter((tag) =>
+    tag.name.toLowerCase().includes(search.toLowerCase())
   );
+
+  console.log("filterted", filteredTags);
 
   const handleReset = () => {
     if (!tags.length) {
@@ -409,11 +412,11 @@ const TagSelectorContent = ({
       <div className="flex flex-col gap-1.5">
         <TagSelectorHeader />
         <ul className="flex flex-col h-[300px] overflow-y-auto">
-          {!!!filteredTags.length ? (
+          {filteredTags.length > 0 ? (
             filteredTags.map((tag) => {
               return <TagSelectorItem key={tag._id} tag={tag} />;
             })
-          ) : (
+          ) : search ? (
             <li>
               <Button
                 variant={"ghost"}
@@ -426,6 +429,10 @@ const TagSelectorContent = ({
                   Create Tag "{search}"
                 </span>
               </Button>
+            </li>
+          ) : (
+            <li className="w-full h-full flex items-center justify-center">
+              No tags
             </li>
           )}
         </ul>
