@@ -118,7 +118,7 @@ const ListForm = ({ data, onOpenChange }) => {
       setProjects((prevItems) => [...prevItems, formData]);
     }
 
-    navigate(`/projects/${formData._id}/tasks`);
+    navigate(`/projects/${data?._id || formData._id}/tasks`);
     resetState();
     onOpenChange(false);
   };

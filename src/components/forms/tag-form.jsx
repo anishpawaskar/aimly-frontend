@@ -88,7 +88,7 @@ const TagForm = ({ data, onOpenChange }) => {
       setTags((prevItems) => [...prevItems, formData]);
     }
 
-    navigate(`/tags/${formData._id}/tasks`);
+    navigate(`/tags/${data?._id || formData._id}/tasks`);
     resetState();
     onOpenChange(false);
   };
