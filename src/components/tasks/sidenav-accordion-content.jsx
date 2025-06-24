@@ -113,7 +113,7 @@ export const SidenavAccordionContent = ({ item }) => {
                 >
                   <NavLink
                     to={item.href({ id: dataItem._id })}
-                    className={"h-full flex flex-1 items-center pl-4"}
+                    className={"h-full flex flex-1 items-center pl-4 truncate"}
                   >
                     <AlignJustify
                       size={18}
@@ -122,13 +122,13 @@ export const SidenavAccordionContent = ({ item }) => {
                     <span className="flex-1 text-sm text-gray truncate">
                       {dataItem.name}
                     </span>
-                    <div
-                      style={{
-                        backgroundColor: dataItem.color,
-                      }}
-                      className="w-2 h-2 rounded-full mx-1.5"
-                    ></div>
                   </NavLink>
+                  <div
+                    style={{
+                      backgroundColor: dataItem.color,
+                    }}
+                    className="w-2 h-2 rounded-full mx-1.5"
+                  ></div>
                   <div className="shrink-0 h-full flex items-center justify-center">
                     <SidenavDropdownMenu data={dataItem} />
                     <span
