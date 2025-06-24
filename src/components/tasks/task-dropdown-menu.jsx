@@ -29,6 +29,7 @@ import { TagSelector, TagSelectorContent } from "../common/tag-selector";
 import { Button } from "../primitive/button";
 import { PopoverMenu, PopoverMenuContent } from "../primitive/popover-menu";
 import { Input } from "../primitive/input";
+import { useTaskPage } from "@/context/task-page-provider";
 
 const DATE_OPTIONS = [
   {
@@ -133,6 +134,39 @@ const TaskDropdownMenuTrigger = () => {
 };
 
 const TaskDateOptions = () => {
+  const { task, setIsOpen } = useTaskDropdownMenu();
+  const { tasks, setTasks } = useTaskPage();
+
+  const handleDateOption = (option) => {
+    const _date = new Date();
+    let currentDate;
+
+    switch (option) {
+      case "Today": {
+        currentDate = _date;
+        break;
+      }
+
+      case "Tomorrow": {
+        currentDate = new Date(_date.valueOf() + ONE_DAY_MS);
+        break;
+      }
+
+      case "Next Week": {
+        currentDate = new Date(_date.valueOf() + ONE_WEEK_MS);
+        break;
+      }
+    }
+
+    const updatedTasks = tasks.map((taskItem) =>
+      taskItem._id === task._id
+        ? { ...taskItem, dueDate: currentDate }
+        : taskItem
+    );
+    setTasks(updatedTasks);
+    setIsOpen(false);
+  };
+
   return (
     <div className="pt-2.5 pb-3.5">
       <p className="px-3 text-xs text-gray/40 mb-1">Date</p>
@@ -162,7 +196,18 @@ const TaskDateOptions = () => {
 
 const TaskPrioritiesOptions = () => {
   const { task, setIsOpen } = useTaskDropdownMenu();
+  const { tasks, setTasks } = useTaskPage();
   const [value, setValue] = useState(task.priority);
+
+  const handlePriority = (priority) => {
+    const updatedTasks = tasks.map((taskItem) =>
+      taskItem._id === task._id
+        ? { ...taskItem, priority: priority.value }
+        : taskItem
+    );
+    setTasks(updatedTasks);
+    setIsOpen(false);
+  };
 
   return (
     <>
@@ -175,7 +220,7 @@ const TaskPrioritiesOptions = () => {
         className={"justify-between px-1.5"}
       >
         {PRIORITIES.map((priority) => {
-          const isSelected = priority.value === value;
+          const isSelected = priority.value === task.priority;
 
           return (
             <DropdownMenuRadioItem
@@ -187,10 +232,7 @@ const TaskPrioritiesOptions = () => {
                 variant={"ghost"}
                 size={"sm"}
                 className={cn("w-8", isSelected && "bg-primary/10")}
-                onClick={() => {
-                  setValue(priority.value);
-                  setIsOpen(false);
-                }}
+                onClick={() => handlePriority(priority)}
               >
                 <Flag
                   size={16}
@@ -208,6 +250,7 @@ const TaskPrioritiesOptions = () => {
 const TaskDropdownMenuOptions = () => {
   const { task, setIsOpen, setIsTagsOpen, setIsMoveToProjectVisible } =
     useTaskDropdownMenu();
+  const { tasks, setTasks } = useTaskPage();
 
   const handleTaskOption = (optionName) => {
     switch (optionName) {
@@ -224,7 +267,10 @@ const TaskDropdownMenuOptions = () => {
       }
 
       case "Delete": {
-        console.log("Delete task", task._id);
+        const updatedTags = tasks.map((taskItem) =>
+          taskItem._id === task._id ? { ...taskItem, status: 2 } : taskItem
+        );
+        setTasks(updatedTags);
         setIsOpen(false);
         break;
       }
@@ -253,12 +299,19 @@ const TaskDropdownMenuOptions = () => {
 
 const TaskMoveProjectSelector = () => {
   const [search, setSearch] = useState("");
+  const { task } = useTaskDropdownMenu();
+  const { projects, tasks, setTasks } = useTaskPage();
 
   const { isMoveToProjectVisible, setIsMoveToProjectVisible, anchorRef } =
     useTaskDropdownMenu();
 
   const handleMoveProject = (project) => {
-    console.log("move to project", project.name);
+    const updatedTasks = tasks.map((taskItem) =>
+      taskItem._id === task._id
+        ? { ...taskItem, projectId: project._id }
+        : taskItem
+    );
+    setTasks(updatedTasks);
     setIsMoveToProjectVisible(false);
   };
 
@@ -285,39 +338,43 @@ const TaskMoveProjectSelector = () => {
           />
         </div>
         <ul className="h-[300px] overflow-y-auto flex flex-col">
-          {TASK_MENU_OPTIONS.map((project, idx) => {
-            const isSelected = idx === 1;
+          {projects
+            .filter((project) =>
+              project.name.toLowerCase().includes(search.toLowerCase())
+            )
+            .map((project) => {
+              const isSelected = project._id === task.projectId;
 
-            return (
-              <li key={idx}>
-                <Button
-                  variant={"ghost"}
-                  size={"full"}
-                  className={"h-8 px-2 justify-between"}
-                  onClick={() => handleMoveProject(project)}
-                >
-                  <span className="flex items-center flex-1 mr-0.5">
-                    <AlignJustify
-                      size={16}
-                      className={cn(
-                        "text-gray/40 shrink-0 mr-3",
-                        isSelected && "text-primary"
-                      )}
-                    />
-                    <span
-                      className={cn(
-                        "flex-1 text-xs text-gray truncate text-start",
-                        isSelected && "text-primary"
-                      )}
-                    >
-                      {project.name}
+              return (
+                <li key={project._id}>
+                  <Button
+                    variant={"ghost"}
+                    size={"full"}
+                    className={"h-8 px-2 justify-between"}
+                    onClick={() => handleMoveProject(project)}
+                  >
+                    <span className="flex items-center flex-1 mr-0.5">
+                      <AlignJustify
+                        size={16}
+                        className={cn(
+                          "text-gray/40 shrink-0 mr-3",
+                          isSelected && "text-primary"
+                        )}
+                      />
+                      <span
+                        className={cn(
+                          "flex-1 text-xs text-gray truncate text-start",
+                          isSelected && "text-primary"
+                        )}
+                      >
+                        {project.name}
+                      </span>
                     </span>
-                  </span>
-                  {isSelected && <Check size={16} className="text-primary" />}
-                </Button>
-              </li>
-            );
-          })}
+                    {isSelected && <Check size={16} className="text-primary" />}
+                  </Button>
+                </li>
+              );
+            })}
         </ul>
       </PopoverMenuContent>
     </PopoverMenu>
@@ -326,6 +383,7 @@ const TaskMoveProjectSelector = () => {
 
 const TaskDropdownMenuContent = () => {
   const {
+    task,
     isOpen,
     isTagsOpen,
     setIsTagsOpen,
@@ -334,6 +392,8 @@ const TaskDropdownMenuContent = () => {
     anchorRef,
     isMoveToProjectVisible,
   } = useTaskDropdownMenu();
+
+  const { tasks, setTasks } = useTaskPage();
 
   return (
     <>
@@ -352,12 +412,20 @@ const TaskDropdownMenuContent = () => {
           setOpen={setIsTagsOpen}
           tags={tags}
           setTags={setTags}
+          task={task}
         >
           <TagSelectorContent
             sideoffset={0}
             anchorRef={anchorRef}
-            handleTagSubmit={(selectedTag) => {
-              setTags(selectedTag);
+            handleTagSubmit={(selectedTags) => {
+              setTags(selectedTags);
+              const newTags = selectedTags.map((tag) => tag._id);
+              const updatedTasks = tasks.map((taskItem) =>
+                taskItem._id === task._id
+                  ? { ...taskItem, tags: newTags }
+                  : taskItem
+              );
+              setTasks(updatedTasks);
               setIsTagsOpen(false);
             }}
           />

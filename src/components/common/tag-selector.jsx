@@ -8,10 +8,13 @@ import {
   PopoverMenuTrigger,
 } from "../primitive/popover-menu";
 import { Slot } from "../primitive/slot";
-import { cn } from "@/lib/utils";
+import { cn, generateSortOrder } from "@/lib/utils";
 import { Button, buttonVariants } from "../primitive/button";
 import { Check, Plus, Search, Tag, X } from "lucide-react";
 import { Input } from "../primitive/input";
+import { useTaskPage } from "@/context/task-page-provider";
+import { BASE_INTERVAL } from "@/constants";
+import { v4 as uuidv4 } from "uuid";
 
 const TAGS = [
   {
@@ -139,11 +142,12 @@ const TAGS = [
 const TagSelectorContext = createContext(null);
 const useTagSelector = () => useContext(TagSelectorContext);
 
-const TagSelector = ({ open, setOpen, tags, setTags, children }) => {
+const TagSelector = ({ task, open, setOpen, tags, setTags, children }) => {
   const [search, setSearch] = useState("");
   const [selectedTags, setSelectedTags] = useState([]);
 
   const contextValue = {
+    task,
     open,
     setOpen,
     search,
@@ -223,6 +227,7 @@ const TagSelectorHeader = () => {
           {selectedTags.map((selectedTag) => {
             return (
               <button
+                key={selectedTag._id}
                 onClick={() => handleCancelTag(selectedTag)}
                 className="max-w-32 truncate text-xs bg-primary/10 text-primary pl-1 pr-0.5 h-5 rounded-sm flex items-center gap-1 group"
               >
@@ -343,11 +348,13 @@ const TagSelectorContent = ({
   handleTagSubmit,
   anchorRef,
 }) => {
-  const { open, tags, selectedTags, setSelectedTags, search, setSearch } =
+  const { task, open, tags, selectedTags, setSelectedTags, search, setSearch } =
     useTagSelector();
 
-  const filteredTags = TAGS.filter((tag) =>
-    search ? tag.name.toLowerCase().includes(search.toLowerCase()) : true
+  const { tags: taskPageTags, setTags, tasks, setTasks } = useTaskPage();
+
+  const filteredTags = taskPageTags.filter((tag) =>
+    tag.name.toLowerCase().includes(search.toLowerCase())
   );
 
   const handleReset = () => {
@@ -360,6 +367,25 @@ const TagSelectorContent = ({
   };
 
   const createNewTag = () => {
+    const payload = {
+      _id: uuidv4(),
+      name: search,
+      color: "",
+    };
+
+    if (taskPageTags.length) {
+      payload.sortOrder = generateSortOrder({ items: taskPageTags });
+    } else {
+      payload.sortOrder = -BASE_INTERVAL;
+    }
+
+    setTags((prevTags) => [...prevTags, payload]);
+    const updatedTasks = tasks.map((taskItem) =>
+      taskItem._id === task._id
+        ? { ...taskItem, tags: [...taskItem.tags, payload._id] }
+        : taskItem
+    );
+    setTasks(updatedTasks);
     setSearch("");
   };
 
@@ -384,11 +410,11 @@ const TagSelectorContent = ({
       <div className="flex flex-col gap-1.5">
         <TagSelectorHeader />
         <ul className="flex flex-col h-[300px] overflow-y-auto">
-          {!!filteredTags.length ? (
+          {filteredTags.length > 0 ? (
             filteredTags.map((tag) => {
               return <TagSelectorItem key={tag._id} tag={tag} />;
             })
-          ) : (
+          ) : search ? (
             <li>
               <Button
                 variant={"ghost"}
@@ -401,6 +427,10 @@ const TagSelectorContent = ({
                   Create Tag "{search}"
                 </span>
               </Button>
+            </li>
+          ) : (
+            <li className="w-full h-full flex items-center justify-center">
+              No tags
             </li>
           )}
         </ul>

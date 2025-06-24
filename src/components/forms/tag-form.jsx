@@ -12,7 +12,9 @@ import { Button } from "../primitive/button";
 import { BASE_INTERVAL } from "@/constants";
 import { generateSortOrder } from "@/lib/utils";
 import { v4 as uuidV4 } from "uuid";
-import { useTasksSidenav } from "@/context/tasks-sidenav-provider";
+// import { useTasksSidenav } from "@/context/tasks-sidenav-provider";
+import { useTaskPage } from "@/context/task-page-provider";
+import { useNavigate } from "react-router";
 
 const TagForm = ({ data, onOpenChange }) => {
   const [formData, setFormData] = useState({
@@ -20,10 +22,12 @@ const TagForm = ({ data, onOpenChange }) => {
     color: data?.color || "",
   });
   const [validationError, setValidationError] = useState({
-    serverError: "",
+    name: "",
   });
 
-  const { items, setItems } = useTasksSidenav();
+  // const { items, setItems } = useTasksSidenav();
+  const { tags, setTags } = useTaskPage();
+  const navigate = useNavigate();
 
   const resetState = () => {
     setFormData({
@@ -32,7 +36,7 @@ const TagForm = ({ data, onOpenChange }) => {
     });
     setValidationError((prevErrors) => ({
       ...prevErrors,
-      serverError: "",
+      name: "",
     }));
   };
 
@@ -43,22 +47,48 @@ const TagForm = ({ data, onOpenChange }) => {
     }));
     setValidationError((prevErrors) => ({
       ...prevErrors,
-      serverError: "",
+      name: "",
     }));
   };
 
   const handleSubmit = () => {
-    let sortOrder;
+    const isExistingTag = tags.find(
+      (tag) =>
+        tag._id !== data._id &&
+        tag.name.toLowerCase().trim() === formData.name.toLowerCase().trim()
+    );
 
-    if (items.length) {
-      sortOrder = generateSortOrder({ items });
-    } else {
-      sortOrder = -BASE_INTERVAL;
+    if (isExistingTag) {
+      setValidationError((prevErrors) => ({
+        ...prevErrors,
+        name: `Tag name ${formData.name} is already taken.`,
+      }));
+      return;
     }
 
-    formData._id = uuidV4();
-    formData.sortOrder = sortOrder;
-    setItems((prevItems) => [...prevItems, formData]);
+    if (data) {
+      const updatedTags = tags.map((tag) =>
+        tag._id === data._id
+          ? { ...tag, ...formData, name: formData.name.trim() }
+          : tag
+      );
+      setTags(updatedTags);
+    } else {
+      let sortOrder;
+
+      if (tags.length) {
+        sortOrder = generateSortOrder({ items: tags });
+      } else {
+        sortOrder = -BASE_INTERVAL;
+      }
+
+      formData._id = uuidV4();
+      formData.sortOrder = sortOrder;
+      formData.name = formData.name.trim();
+      setTags((prevItems) => [...prevItems, formData]);
+    }
+
+    navigate(`/tags/${data?._id || formData._id}/tasks`);
     resetState();
     onOpenChange(false);
   };
@@ -77,6 +107,7 @@ const TagForm = ({ data, onOpenChange }) => {
           type={"text"}
           placeholder={"Name"}
           value={formData.name}
+          maxLength={64}
           onChange={(e) => {
             setFormData((prevFormData) => ({
               ...prevFormData,
@@ -84,10 +115,13 @@ const TagForm = ({ data, onOpenChange }) => {
             }));
             setValidationError((prevErrors) => ({
               ...prevErrors,
-              serverError: "",
+              name: "",
             }));
           }}
         />
+        {validationError.name && (
+          <p className="text-xs text-wran-red">{validationError.name}</p>
+        )}
       </div>
       <ColorPicker
         placeholder={"Color"}

@@ -20,7 +20,9 @@ import { ColorPicker } from "../common/color-picker";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../primitive/tooltip";
 import { BASE_INTERVAL } from "@/constants";
 import { v4 as uuidV4 } from "uuid";
-import { useTasksSidenav } from "@/context/tasks-sidenav-provider";
+// import { useTasksSidenav } from "@/context/tasks-sidenav-provider";
+import { useTaskPage } from "@/context/task-page-provider";
+import { useNavigate } from "react-router";
 
 const PROJECT_VIEW_TYPE = [
   {
@@ -47,11 +49,13 @@ const ListForm = ({ data, onOpenChange }) => {
     viewType: data?.viewType || "list",
   });
   const [validationError, setValidationError] = useState({
-    serverError: "",
+    name: "",
   });
   const [isInputFocus, setIsInputFocus] = useState(false);
 
-  const { items, setItems } = useTasksSidenav();
+  // const { items, setItems } = useTasksSidenav();
+  const { projects, setProjects } = useTaskPage();
+  const navigate = useNavigate();
 
   const nameInputRef = useRef(null);
 
@@ -62,7 +66,7 @@ const ListForm = ({ data, onOpenChange }) => {
       viewType: "list",
     });
     setValidationError({
-      serverError: "",
+      name: "",
     });
   };
 
@@ -73,22 +77,48 @@ const ListForm = ({ data, onOpenChange }) => {
     }));
     setValidationError((prevErrors) => ({
       ...prevErrors,
-      serverError: "",
+      name: "",
     }));
   };
 
   const handleSubmit = () => {
-    let sortOrder;
+    const isExistingProject = projects.find(
+      (project) =>
+        project._id !== data._id &&
+        project.name.toLowerCase() === formData.name.toLowerCase().trim()
+    );
 
-    if (items.length) {
-      sortOrder = generateSortOrder({ items });
-    } else {
-      sortOrder = -BASE_INTERVAL;
+    if (isExistingProject) {
+      setValidationError((prevErrors) => ({
+        ...prevErrors,
+        name: "This list name is already exist.",
+      }));
+      return;
     }
 
-    formData._id = uuidV4();
-    formData.sortOrder = sortOrder;
-    setItems((prevItems) => [...prevItems, formData]);
+    if (data) {
+      const updatedProjects = projects.map((project) =>
+        project._id === data._id
+          ? { ...project, ...formData, name: formData.name.trim() }
+          : project
+      );
+      setProjects(updatedProjects);
+    } else {
+      let sortOrder;
+
+      if (projects.length) {
+        sortOrder = generateSortOrder({ items: projects });
+      } else {
+        sortOrder = -BASE_INTERVAL;
+      }
+
+      formData._id = uuidV4();
+      formData.sortOrder = sortOrder;
+      formData.name = formData.name.trim();
+      setProjects((prevItems) => [...prevItems, formData]);
+    }
+
+    navigate(`/projects/${data?._id || formData._id}/tasks`);
     resetState();
     onOpenChange(false);
   };
@@ -102,35 +132,44 @@ const ListForm = ({ data, onOpenChange }) => {
     <AlertDialogContent>
       <AlertDialogTitle>Add List</AlertDialogTitle>
       <div className="flex flex-col gap-4">
-        <div
-          className={cn(
-            "list-name-input-wrapper h-9 rounded-md border border-gray/10 flex items-center group/nameInput",
-            isInputFocus && "border-primary"
+        <div>
+          <div
+            className={cn(
+              "list-name-input-wrapper h-9 rounded-md border border-gray/10 flex items-center group/nameInput",
+              isInputFocus && "border-primary"
+            )}
+          >
+            <button className="h-full w-9 border-r border-gray/10 flex items-center justify-center text-gray/50">
+              <AlignJustify
+                size={18}
+                className="group-hover/nameInput:hidden"
+              />
+              <Smile size={18} className="hidden group-hover/nameInput:block" />
+            </button>
+            <Input
+              className={"h-full border-none placeholder:text-gray/30"}
+              type={"text"}
+              placeholder={"Name"}
+              ref={nameInputRef}
+              maxLength={64}
+              onFocus={() => setIsInputFocus(true)}
+              onBlur={() => setIsInputFocus(false)}
+              value={formData.name}
+              onChange={(e) => {
+                setFormData((prevFormData) => ({
+                  ...prevFormData,
+                  name: e.target.value,
+                }));
+                setValidationError((prevErrors) => ({
+                  ...prevErrors,
+                  name: "",
+                }));
+              }}
+            />
+          </div>
+          {validationError.name && (
+            <p className="text-xs text-wran-red">{validationError.name}</p>
           )}
-        >
-          <button className="h-full w-9 border-r border-gray/10 flex items-center justify-center text-gray/50">
-            <AlignJustify size={18} className="group-hover/nameInput:hidden" />
-            <Smile size={18} className="hidden group-hover/nameInput:block" />
-          </button>
-          <Input
-            className={"h-full border-none placeholder:text-gray/30"}
-            type={"text"}
-            placeholder={"Name"}
-            ref={nameInputRef}
-            onFocus={() => setIsInputFocus(true)}
-            onBlur={() => setIsInputFocus(false)}
-            value={formData.name}
-            onChange={(e) => {
-              setFormData((prevFormData) => ({
-                ...prevFormData,
-                name: e.target.value,
-              }));
-              setValidationError((prevErrors) => ({
-                ...prevErrors,
-                serverError: "",
-              }));
-            }}
-          />
         </div>
         <ColorPicker
           placeholder={"List Color"}
@@ -160,7 +199,7 @@ const ListForm = ({ data, onOpenChange }) => {
                         }));
                         setValidationError((prevErrors) => ({
                           ...prevErrors,
-                          serverError: "",
+                          name: "",
                         }));
                       }}
                     >
@@ -179,7 +218,6 @@ const ListForm = ({ data, onOpenChange }) => {
             })}
           </div>
         </div>
-        {validationError.serverError && <p>{validationError.serverError}</p>}
       </div>
       <AlertDialogFooter className={"mt-8"}>
         <AlertDialogCancel asChild>
