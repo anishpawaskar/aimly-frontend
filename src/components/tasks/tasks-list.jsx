@@ -1,5 +1,5 @@
 import { Link, useLocation, useParams } from "react-router";
-import { Square } from "lucide-react";
+import { Square, SquareCheck } from "lucide-react";
 import { useState } from "react";
 import {
   DatePicker,
@@ -113,9 +113,23 @@ const TaskListItem = ({ task }) => {
   );
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
 
+  const { tasks, setTasks } = useTaskPage();
+
   const priority = PRIORITIES.find(
     (priority) => priority.value === task.priority
   );
+
+  const handleCompleted = (e) => {
+    e.stopPropogation();
+    e.preventDefault();
+    const updatedTask = tasks.map((taskItem) =>
+      taskItem._id === task._id
+        ? { ...taskItem, status: taskItem.status === 1 ? 0 : 1 }
+        : taskItem
+    );
+
+    setTasks(updatedTask);
+  };
 
   return (
     <li
@@ -126,12 +140,19 @@ const TaskListItem = ({ task }) => {
         to={`${location.pathname}/${task._id}`}
         className="h-full flex flex-1 items-center"
       >
-        <button className={"h-6 w-6 rounded-md flex items-center shrink-0"}>
-          <Square
-            size={20}
-            strokeWidth={1.5}
-            className={`${priority.color} transition-colors`}
-          />
+        <button
+          onClick={handleCompleted}
+          className={"h-6 w-6 rounded-md flex items-center shrink-0"}
+        >
+          {task?.status !== 1 ? (
+            <Square
+              size={20}
+              strokeWidth={1.5}
+              className={`${priority.color} transition-colors`}
+            />
+          ) : (
+            <SquareCheck size={20} className="text-gray/40" />
+          )}
         </button>
         <span className="task-title text-sm grow truncate">{task.title}</span>
       </Link>
