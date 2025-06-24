@@ -84,6 +84,7 @@ const ListForm = ({ data, onOpenChange }) => {
   const handleSubmit = () => {
     const isExistingProject = projects.find(
       (project) =>
+        project._id !== data._id &&
         project.name.toLowerCase() === formData.name.toLowerCase().trim()
     );
 
@@ -115,9 +116,9 @@ const ListForm = ({ data, onOpenChange }) => {
       formData.sortOrder = sortOrder;
       formData.name = formData.name.trim();
       setProjects((prevItems) => [...prevItems, formData]);
-      navigate(`/projects/${formData._id}/tasks`);
     }
 
+    navigate(`/projects/${formData._id}/tasks`);
     resetState();
     onOpenChange(false);
   };

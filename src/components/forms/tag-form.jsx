@@ -54,6 +54,7 @@ const TagForm = ({ data, onOpenChange }) => {
   const handleSubmit = () => {
     const isExistingTag = tags.find(
       (tag) =>
+        tag._id !== data._id &&
         tag.name.toLowerCase().trim() === formData.name.toLowerCase().trim()
     );
 
@@ -85,9 +86,9 @@ const TagForm = ({ data, onOpenChange }) => {
       formData.sortOrder = sortOrder;
       formData.name = formData.name.trim();
       setTags((prevItems) => [...prevItems, formData]);
-      navigate(`/tags/${formData._id}/tasks`);
     }
 
+    navigate(`/tags/${formData._id}/tasks`);
     resetState();
     onOpenChange(false);
   };
