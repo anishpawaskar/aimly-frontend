@@ -1,6 +1,5 @@
 import { Link, useLocation, useParams } from "react-router";
-import { TASKS_DATA } from "./tasks.constant";
-import { Ellipsis, Square } from "lucide-react";
+import { Square } from "lucide-react";
 import { useState } from "react";
 import {
   DatePicker,
@@ -14,8 +13,35 @@ import {
 } from "./task-dropdown-menu";
 import { useTaskPage } from "@/context/task-page-provider";
 
+const PRIORITIES = [
+  {
+    name: "High",
+    value: 5,
+    color: "text-priority-high",
+    fillColor: "fill-priority-high",
+  },
+  {
+    name: "Medium",
+    value: 3,
+    color: "text-priority-medium",
+    fillColor: "fill-priority-medium",
+  },
+  {
+    name: "Low",
+    value: 1,
+    color: "text-priority-low",
+    fillColor: "fill-priority-low",
+  },
+  {
+    name: "None",
+    value: 0,
+    color: "text-gray/60",
+    fillColor: "fill-transparent",
+  },
+];
+
 export const TasksList = () => {
-  const { tasks, tags } = useTaskPage();
+  const { tasks } = useTaskPage();
 
   const location = useLocation();
   const params = useParams();
@@ -27,7 +53,7 @@ export const TasksList = () => {
   if (isProjectsPage) {
     data = tasks
       .filter(
-        (task) => task.projectId === params?.projectId && task.status === 1
+        (task) => task.projectId === params?.projectId && task.status === 0
       )
       .map((task) => {
         const tags = task.tags.map((tagId) => {
@@ -48,7 +74,7 @@ export const TasksList = () => {
       .sort((a, b) => a.sortOrder - b.sortOrder);
   } else {
     data = tasks
-      .filter((task) => task.tags.includes(params?.tagId) && task.status === 1)
+      .filter((task) => task.tags.includes(params?.tagId) && task.status === 0)
       .map((task) => {
         const tags = task.tags.map((tagId) => {
           const existingTag = tags.find((tag) => tag._id === tagId);
@@ -87,6 +113,10 @@ const TaskListItem = ({ task }) => {
   );
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
 
+  const priority = PRIORITIES.find(
+    (priority) => priority.value === task.priority
+  );
+
   return (
     <li
       key={task._id}
@@ -97,7 +127,11 @@ const TaskListItem = ({ task }) => {
         className="h-full flex flex-1 items-center"
       >
         <button className={"h-6 w-6 rounded-md flex items-center shrink-0"}>
-          <Square size={20} strokeWidth={1.5} className="text-gray/50" />
+          <Square
+            size={20}
+            strokeWidth={1.5}
+            className={`${priority.color} transition-colors`}
+          />
         </button>
         <span className="task-title text-sm grow truncate">{task.title}</span>
       </Link>
