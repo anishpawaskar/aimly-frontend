@@ -22,6 +22,7 @@ import { BASE_INTERVAL } from "@/constants";
 import { v4 as uuidV4 } from "uuid";
 // import { useTasksSidenav } from "@/context/tasks-sidenav-provider";
 import { useTaskPage } from "@/context/task-page-provider";
+import { useNavigate } from "react-router";
 
 const PROJECT_VIEW_TYPE = [
   {
@@ -54,6 +55,7 @@ const ListForm = ({ data, onOpenChange }) => {
 
   // const { items, setItems } = useTasksSidenav();
   const { projects, setProjects } = useTaskPage();
+  const navigate = useNavigate();
 
   const nameInputRef = useRef(null);
 
@@ -91,6 +93,7 @@ const ListForm = ({ data, onOpenChange }) => {
     formData._id = uuidV4();
     formData.sortOrder = sortOrder;
     setProjects((prevItems) => [...prevItems, formData]);
+    navigate(`/projects/${formData._id}/tasks`);
     resetState();
     onOpenChange(false);
   };

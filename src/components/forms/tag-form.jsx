@@ -14,6 +14,7 @@ import { generateSortOrder } from "@/lib/utils";
 import { v4 as uuidV4 } from "uuid";
 // import { useTasksSidenav } from "@/context/tasks-sidenav-provider";
 import { useTaskPage } from "@/context/task-page-provider";
+import { useNavigate } from "react-router";
 
 const TagForm = ({ data, onOpenChange }) => {
   const [formData, setFormData] = useState({
@@ -26,6 +27,7 @@ const TagForm = ({ data, onOpenChange }) => {
 
   // const { items, setItems } = useTasksSidenav();
   const { tags, setTags } = useTaskPage();
+  const navigate = useNavigate();
 
   const resetState = () => {
     setFormData({
@@ -61,6 +63,7 @@ const TagForm = ({ data, onOpenChange }) => {
     formData._id = uuidV4();
     formData.sortOrder = sortOrder;
     setTags((prevItems) => [...prevItems, formData]);
+    navigate(`/tags/${formData._id}/tasks`);
     resetState();
     onOpenChange(false);
   };
