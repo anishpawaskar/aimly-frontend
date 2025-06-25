@@ -6,6 +6,8 @@ export const userSigninEndpoint = "/v1/auth/signin";
 
 // projects
 export const getProjectsEndpoint = "/v1/projects";
+export const updateProjectEndpoint = (projectId) => `/v1/projects/${projectId}`;
 
 // tags
 export const getTagsEndpoint = "/v1/tags";
+export const updateTagEndpoint = (tagId) => `/v1/tags/${tagId}`;
