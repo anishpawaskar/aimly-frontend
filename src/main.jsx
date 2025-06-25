@@ -19,8 +19,8 @@ createRoot(document.getElementById("root")).render(
             <App />
           </TaskPageProvider>
         </ThemeProvider>
+        <ReactQueryDevtools initialIsOpen={false} />
       </QueryClientProvider>
-      <ReactQueryDevtools initialIsOpen={false} />
     </BrowserRouter>
   </StrictMode>
 );
