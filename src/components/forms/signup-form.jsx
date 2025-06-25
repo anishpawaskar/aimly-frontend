@@ -2,7 +2,7 @@ import { isValidEmail, validateInputs } from "@/lib/utils";
 import { AuthForm } from "./auth-form";
 import { useState } from "react";
 import { useMutation } from "@tanstack/react-query";
-import { signupUser } from "@/services/auth/signup";
+import { signupUser } from "@/services/auth";
 
 export const SignupForm = () => {
   const [formData, setFormData] = useState({
