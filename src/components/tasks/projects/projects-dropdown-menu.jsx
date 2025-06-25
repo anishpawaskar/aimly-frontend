@@ -44,7 +44,7 @@ export const ProjectsDropdownMenu = ({ data }) => {
         <DropdownMenuTrigger asChild>
           <button
             onClick={() => setIsMenuOpen((prevState) => !prevState)}
-            className="shrink-0 h-5 w-5 invisible group-hover/content:visible transition-none"
+            className="shrink-0 h-4 w-4 hidden group-hover/content:block transition-none"
           >
             <Ellipsis size={16} className="text-gray/40" />
           </button>
