@@ -12,9 +12,9 @@ import { Button } from "../primitive/button";
 import { BASE_INTERVAL } from "@/constants";
 import { generateSortOrder } from "@/lib/utils";
 import { v4 as uuidV4 } from "uuid";
-// import { useTasksSidenav } from "@/context/tasks-sidenav-provider";
 import { useTaskPage } from "@/context/task-page-provider";
 import { useNavigate } from "react-router";
+import { useUpdateTag } from "@/hooks/mutations/tags";
 
 const TagForm = ({ data, onOpenChange }) => {
   const [formData, setFormData] = useState({
@@ -24,6 +24,10 @@ const TagForm = ({ data, onOpenChange }) => {
   const [validationError, setValidationError] = useState({
     name: "",
   });
+
+  const { mutate, isPending } = useUpdateTag();
+  const submitBtnName = data ? "Save" : "Add";
+  const loadingBtnName = submitBtnName === "Save" ? "Saving..." : "Adding...";
 
   // const { items, setItems } = useTasksSidenav();
   const { tags, setTags } = useTaskPage();
@@ -73,6 +77,16 @@ const TagForm = ({ data, onOpenChange }) => {
           : tag
       );
       setTags(updatedTags);
+      mutate(
+        { tagId: data?._id, payload: formData },
+        {
+          onSuccess: () => {
+            resetState();
+            onOpenChange(false);
+            // navigate(`/tags/${data?._id}/tasks`);
+          },
+        }
+      );
     } else {
       let sortOrder;
 
@@ -86,11 +100,10 @@ const TagForm = ({ data, onOpenChange }) => {
       formData.sortOrder = sortOrder;
       formData.name = formData.name.trim();
       setTags((prevItems) => [...prevItems, formData]);
+      // navigate(`/tags/${data?._id || formData._id}/tasks`);
+      resetState();
+      onOpenChange(false);
     }
-
-    navigate(`/tags/${data?._id || formData._id}/tasks`);
-    resetState();
-    onOpenChange(false);
   };
 
   const handleCancel = () => {
@@ -137,10 +150,10 @@ const TagForm = ({ data, onOpenChange }) => {
         <AlertDialogAction asChild>
           <Button
             variant={"primary"}
-            disabled={formData.name === ""}
+            disabled={formData.name === "" || isPending}
             onClick={handleSubmit}
           >
-            Add
+            {isPending ? loadingBtnName : submitBtnName}
           </Button>
         </AlertDialogAction>
       </AlertDialogFooter>
