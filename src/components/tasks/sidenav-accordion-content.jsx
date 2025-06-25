@@ -24,7 +24,7 @@ export const SidenavAccordionContent = ({ item }) => {
   // const items = item.value === "lists" ? projects : tags;
   // const setItems = item.value === "lists" ? setProjects : setTags;
 
-  const data = queryData ? [...queryData?.data?.[item.dataKey]] : [];
+  const data = queryData?.data?.[item.dataKey] || [];
   const SidenavDropdownMenu = item.dropdownMenu;
 
   const location = useLocation();
@@ -41,7 +41,7 @@ export const SidenavAccordionContent = ({ item }) => {
   };
 
   const handleDrop = () => {
-    const newItems = [...queryData?.data?.[item.dataKey]];
+    const newItems = [...data];
     newItems.sort((a, b) => a.sortOrder - b.sortOrder);
 
     const beforeItemIndex = newItems.findIndex(
@@ -59,22 +59,22 @@ export const SidenavAccordionContent = ({ item }) => {
 
     if (!afterItem) {
       newSortOrder = moveToBottomSortOrder({
-        items: queryData?.data?.[item.dataKey],
+        items: data,
         itemId: dragItemRef.current,
       });
     }
 
     if (beforeItem && afterItem) {
       newSortOrder = moveToMiddleSortOrder({
-        items: queryData?.data?.[item.dataKey],
+        items: data,
         afterItemId: afterItem._id,
         beforeItemId: beforeItem._id,
       });
     }
 
-    if (queryData?.data?.[item.dataKey].length > 0 && beforeItemIndex === 0) {
+    if (data.length > 0 && beforeItemIndex === 0) {
       newSortOrder = moveToTopSortOrder({
-        items: queryData?.data?.[item.dataKey],
+        items: data,
       });
     }
 
@@ -101,7 +101,7 @@ export const SidenavAccordionContent = ({ item }) => {
             {item.fallbackText}
           </li>
         ) : (
-          data
+          [...data]
             .sort((a, b) => a.sortOrder - b.sortOrder)
             .map((dataItem) => {
               const isActive =
