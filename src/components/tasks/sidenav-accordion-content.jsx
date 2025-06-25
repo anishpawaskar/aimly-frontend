@@ -10,16 +10,13 @@ import {
 } from "@/lib/utils";
 import { useRef } from "react";
 import { useTaskPage } from "@/context/task-page-provider";
-import { useQuery } from "@tanstack/react-query";
+import { useTasksSidenavData } from "@/hooks/queries/tasksSidenav";
 
 export const SidenavAccordionContent = ({ item }) => {
   // const { items, setItems } = useTasksSidenav();
   // const { projects, setProjects, tags, setTags } = useTaskPage();
 
-  const { data: queryData } = useQuery({
-    queryKey: item.queryKey,
-    queryFn: item.queryFn,
-  });
+  const { data: queryData } = useTasksSidenavData(item);
 
   const totalCountKey =
     item.value === "lists" ? "totalAssignTasks" : "assignTaskCount";
@@ -44,7 +41,7 @@ export const SidenavAccordionContent = ({ item }) => {
   };
 
   const handleDrop = () => {
-    const newItems = [...items];
+    const newItems = [...queryData?.data?.[item.dataKey]];
     newItems.sort((a, b) => a.sortOrder - b.sortOrder);
 
     const beforeItemIndex = newItems.findIndex(
@@ -62,29 +59,31 @@ export const SidenavAccordionContent = ({ item }) => {
 
     if (!afterItem) {
       newSortOrder = moveToBottomSortOrder({
-        items,
+        items: queryData?.data?.[item.dataKey],
         itemId: dragItemRef.current,
       });
     }
 
     if (beforeItem && afterItem) {
       newSortOrder = moveToMiddleSortOrder({
-        items,
+        items: queryData?.data?.[item.dataKey],
         afterItemId: afterItem._id,
         beforeItemId: beforeItem._id,
       });
     }
 
-    if (items.length > 0 && beforeItemIndex === 0) {
-      newSortOrder = moveToTopSortOrder({ items });
+    if (queryData?.data?.[item.dataKey].length > 0 && beforeItemIndex === 0) {
+      newSortOrder = moveToTopSortOrder({
+        items: queryData?.data?.[item.dataKey],
+      });
     }
 
-    const updatedItems = items.map((item) =>
-      item._id === dragItemRef.current
-        ? { ...item, sortOrder: newSortOrder }
-        : item
-    );
-    setItems(updatedItems);
+    // const updatedItems = queryData?.data?.[item.dataKey].map((item) =>
+    //   item._id === dragItemRef.current
+    //     ? { ...item, sortOrder: newSortOrder }
+    //     : item
+    // );
+    // setItems(updatedItems);
   };
 
   return (
