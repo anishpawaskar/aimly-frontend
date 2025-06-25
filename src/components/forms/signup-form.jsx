@@ -1,6 +1,8 @@
 import { isValidEmail, validateInputs } from "@/lib/utils";
 import { AuthForm } from "./auth-form";
 import { useState } from "react";
+import { useMutation } from "@tanstack/react-query";
+import { signupUser } from "@/services/auth";
 
 export const SignupForm = () => {
   const [formData, setFormData] = useState({
@@ -11,6 +13,10 @@ export const SignupForm = () => {
     email: "",
     password: "",
     serverError: "",
+  });
+
+  const { mutateAsync, isPending } = useMutation({
+    mutationFn: signupUser,
   });
 
   const onChange = (e) => {
@@ -50,7 +56,7 @@ export const SignupForm = () => {
     return errors;
   };
 
-  const onSubmit = (e) => {
+  const onSubmit = async (e) => {
     e.preventDefault();
     const errors = validateForm();
 
@@ -62,7 +68,15 @@ export const SignupForm = () => {
       return;
     }
 
-    console.log("save kar");
+    try {
+      const user = await mutateAsync(formData);
+      console.log("user", user);
+    } catch (error) {
+      setValidationErrors((prevErrors) => ({
+        ...prevErrors,
+        serverError: error?.message,
+      }));
+    }
   };
 
   return (
@@ -73,6 +87,7 @@ export const SignupForm = () => {
       onSubmit={onSubmit}
       formData={formData}
       validationErrors={validationErrors}
+      isLoading={isPending}
     />
   );
 };

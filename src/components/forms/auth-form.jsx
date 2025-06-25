@@ -12,6 +12,7 @@ export const AuthForm = ({
   authType,
   formData,
   validationErrors,
+  isLoading = false,
 }) => {
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const [isPasswordFocus, setIsPasswordFocus] = useState(false);
@@ -25,6 +26,7 @@ export const AuthForm = ({
     : "Password: 8-30 characters";
   const authRedirectRoute = isSignInForm ? "/signup" : "/signin";
   const authRedirectName = isSignInForm ? "Sign Up" : "Sign In";
+  const authLoadingBtnName = isSignInForm ? "Signing in..." : "Signing up...";
 
   const forgotPasswordValues = {
     pathname: "/requestRestPassword",
@@ -94,7 +96,9 @@ export const AuthForm = ({
             </p>
           )}
         </div>
-        <Button size={"full"}>{heading}</Button>
+        <Button size={"full"} disabled={isLoading}>
+          {isLoading ? authLoadingBtnName : heading}
+        </Button>
       </form>
       {/* {isSignInForm && (
         <div className="flex justify-center items-center">
