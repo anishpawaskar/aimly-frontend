@@ -10,15 +10,24 @@ import {
 } from "@/lib/utils";
 import { useRef } from "react";
 import { useTaskPage } from "@/context/task-page-provider";
+import { useQuery } from "@tanstack/react-query";
 
 export const SidenavAccordionContent = ({ item }) => {
   // const { items, setItems } = useTasksSidenav();
-  const { projects, setProjects, tags, setTags } = useTaskPage();
+  // const { projects, setProjects, tags, setTags } = useTaskPage();
 
-  const items = item.value === "lists" ? projects : tags;
-  const setItems = item.value === "lists" ? setProjects : setTags;
+  const { data: queryData } = useQuery({
+    queryKey: item.queryKey,
+    queryFn: item.queryFn,
+  });
 
-  const data = [...items];
+  const totalCountKey =
+    item.value === "lists" ? "totalAssignTasks" : "assignTaskCount";
+
+  // const items = item.value === "lists" ? projects : tags;
+  // const setItems = item.value === "lists" ? setProjects : setTags;
+
+  const data = queryData ? [...queryData?.data?.[item.dataKey]] : [];
   const SidenavDropdownMenu = item.dropdownMenu;
 
   const location = useLocation();
@@ -107,7 +116,7 @@ export const SidenavAccordionContent = ({ item }) => {
                   onDragStart={handleDragStart}
                   onDragEnter={handleDragEnter}
                   className={cn(
-                    "h-9 pr-2 flex items-center relative group/content sm:hover:bg-cancel-btn-hover sm:active:bg-cancel-btn-active rounded-md transition-colors",
+                    "h-9 pr-2 flex items-center group/content sm:hover:bg-cancel-btn-hover sm:active:bg-cancel-btn-active rounded-md transition-colors",
                     isActive && "bg-gray/5"
                   )}
                 >
@@ -129,14 +138,14 @@ export const SidenavAccordionContent = ({ item }) => {
                     }}
                     className="w-2 h-2 rounded-full mx-1.5"
                   ></div>
-                  <div className="shrink-0 h-full flex items-center justify-center">
+                  <div className="shrink-0 flex items-center justify-end min-w-6">
                     <SidenavDropdownMenu data={dataItem} />
                     <span
                       className={
-                        "text-xs text-gray/40 absolute right-[15px] top-1/2 -translate-y-1/2 group-hover/content:invisible visible"
+                        "text-xs text-gray/40 block group-hover/content:hidden"
                       }
                     >
-                      3
+                      {!!dataItem[totalCountKey] && dataItem[totalCountKey]}
                     </span>
                   </div>
                 </li>

@@ -3,6 +3,8 @@ import ListForm from "../forms/list-form";
 import TagForm from "../forms/tag-form";
 import { ProjectsDropdownMenu } from "./projects/projects-dropdown-menu";
 import { TagsDropdownMenu } from "./tags/tags-dropdown-menu";
+import { getProjects } from "@/services/projects";
+import { getTags } from "@/services/tags";
 
 export const SMART_LIST = [
   {
@@ -30,6 +32,9 @@ export const SIDENAV_ACCORDION_ITEMS = [
     href: ({ id }) => `/projects/${id}/tasks`,
     fallbackText: "Use lists to categorize and manage your tasks and notes",
     dropdownMenu: ProjectsDropdownMenu,
+    queryKey: "projects",
+    queryFn: getProjects,
+    dataKey: "projects",
   },
   {
     title: "Tags",
@@ -38,6 +43,9 @@ export const SIDENAV_ACCORDION_ITEMS = [
     href: ({ id }) => `/tags/${id}/tasks`,
     fallbackText: `Categorize your tasks with tags. Quickly select a tag by typing "#" when adding a task`,
     dropdownMenu: TagsDropdownMenu,
+    queryKey: "tags",
+    queryFn: getTags,
+    dataKey: "tags",
   },
 ];
 
