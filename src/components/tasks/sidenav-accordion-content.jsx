@@ -17,14 +17,11 @@ export const SidenavAccordionContent = ({ item }) => {
   // const { projects, setProjects, tags, setTags } = useTaskPage();
 
   const { data: queryData } = useTasksSidenavData(item);
+  const data = queryData?.data?.[item.dataKey] ?? [];
 
   const totalCountKey =
     item.value === "lists" ? "totalAssignTasks" : "assignTaskCount";
 
-  // const items = item.value === "lists" ? projects : tags;
-  // const setItems = item.value === "lists" ? setProjects : setTags;
-
-  const data = queryData?.data?.[item.dataKey] || [];
   const SidenavDropdownMenu = item.dropdownMenu;
 
   const location = useLocation();
