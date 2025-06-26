@@ -1,7 +1,6 @@
 import { AlignJustify } from "lucide-react";
 import { AccordionContent } from "../primitive/accordion";
 import { NavLink, useLocation } from "react-router";
-import { useTasksSidenav } from "@/context/tasks-sidenav-provider";
 import {
   cn,
   moveToBottomSortOrder,
@@ -9,14 +8,12 @@ import {
   moveToTopSortOrder,
 } from "@/lib/utils";
 import { useRef } from "react";
-import { useTaskPage } from "@/context/task-page-provider";
 import { useTasksSidenavData } from "@/hooks/queries/tasksSidenav";
+import { useUpdateTag } from "@/hooks/mutations/tags";
 
 export const SidenavAccordionContent = ({ item }) => {
-  // const { items, setItems } = useTasksSidenav();
-  // const { projects, setProjects, tags, setTags } = useTaskPage();
-
   const { data: queryData } = useTasksSidenavData(item);
+  const { mutate } = useUpdateTag();
   const data = queryData?.data?.[item.dataKey] ?? [];
 
   const totalCountKey =
@@ -75,12 +72,11 @@ export const SidenavAccordionContent = ({ item }) => {
       });
     }
 
-    // const updatedItems = queryData?.data?.[item.dataKey].map((item) =>
-    //   item._id === dragItemRef.current
-    //     ? { ...item, sortOrder: newSortOrder }
-    //     : item
-    // );
-    // setItems(updatedItems);
+    const payload = {
+      sortOrder: newSortOrder,
+    };
+
+    mutate({ tagId: dragItemRef.current, payload, optimistic: true });
   };
 
   return (

@@ -65,15 +65,32 @@ export const useUpdateTag = () => {
         return { ...oldData, data: { tags: updatedTags } };
       });
 
-      return { previousTags };
+      const newTags = queryClient.getQueryData(["tags"]);
+
+      return { previousTags, newTags };
     },
     onError: (_error, variables, context) => {
       if (variables.optimistic) {
         queryClient.setQueryData(["tags"], context.previousTags);
       }
     },
-    onSuccess: (data, variables) => {
-      if (!variables.optimistic) {
+    onSuccess: (data, variables, context) => {
+      if (variables?.optimistic) {
+        const newTagsData = context.newTags;
+
+        const updatedTags = newTagsData.data.tags.map((tag) =>
+          tag._id === data.data._id ? { ...tag, ...data.data } : tag
+        );
+
+        const updatedTagsData = {
+          ...newTagsData,
+          data: {
+            tags: updatedTags,
+          },
+        };
+
+        queryClient.setQueryData(["tags"], updatedTagsData);
+      } else {
         queryClient.setQueryData(["tags"], (oldData) => {
           const updatedTags = oldData.data.tags.map((tag) =>
             tag._id === data.data._id ? { ...tag, ...data.data } : tag
