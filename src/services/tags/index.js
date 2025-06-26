@@ -54,7 +54,7 @@ export const updateTag = async (tagId, payload) => {
 
 export const deleteTag = async (tagId) => {
   try {
-    const res = axiosInstance.delete(deleteTagEndpoint(tagId));
+    const res = await axiosInstance.delete(deleteTagEndpoint(tagId));
     return res.data;
   } catch (error) {
     if (axios.isAxiosError(error)) {
