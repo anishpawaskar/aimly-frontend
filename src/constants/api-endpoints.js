@@ -13,3 +13,4 @@ export const updateProjectEndpoint = (projectId) => `/v1/projects/${projectId}`;
 export const createTagEndpoint = "/v1/tags";
 export const getTagsEndpoint = "/v1/tags";
 export const updateTagEndpoint = (tagId) => `/v1/tags/${tagId}`;
+export const deleteTagEndpoint = (tagId) => `/v1/tags/${tagId}`;
