@@ -113,3 +113,11 @@ export const mergeRefs = (...refs) => {
     }
   };
 };
+
+export const encodeStr = (str) => {
+  return btoa(str);
+};
+
+export const decodeStr = (str) => {
+  return atob(str);
+};
