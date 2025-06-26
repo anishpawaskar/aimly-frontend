@@ -1,6 +1,25 @@
 import axiosInstance from "@/config/api";
-import { getTagsEndpoint, updateTagEndpoint } from "@/constants/api-endpoints";
+import {
+  createTagEndpoint,
+  getTagsEndpoint,
+  updateTagEndpoint,
+} from "@/constants/api-endpoints";
 import axios from "axios";
+
+export const createTag = async (payload) => {
+  try {
+    const res = await axiosInstance.post(createTagEndpoint, payload);
+    return res.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      const message =
+        error.response?.data?.message || "Error while fetching tags.";
+      throw new Error(message);
+    }
+
+    throw error;
+  }
+};
 
 export const getTags = async () => {
   try {
