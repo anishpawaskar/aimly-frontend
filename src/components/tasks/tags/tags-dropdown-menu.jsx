@@ -5,17 +5,20 @@ import {
   DropdownMenuTrigger,
 } from "@/components/primitive/dropdown-menu";
 import { Ellipsis } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { TAGS_DROPDOWN_MENU_ITEM } from "./tags.constant";
 import { Button } from "@/components/primitive/button";
 import DeleteDialog from "@/components/common/delete-dialog";
 import { AlertDialog } from "@/components/primitive/alert-dialog";
 import TagForm from "@/components/forms/tag-form";
+import { useDeleteTag } from "@/hooks/mutations/tags";
 
 export const TagsDropdownMenu = ({ data }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isDeleteMenuOpen, setIsDeleteMenuOpen] = useState(false);
   const [isEditFormOpen, setIsEditFormOpen] = useState(false);
+
+  const { mutate: deleteTagMutate, isPending: isTagDeleting } = useDeleteTag();
 
   const handleMenuItem = (name) => {
     switch (name) {
@@ -39,9 +42,19 @@ export const TagsDropdownMenu = ({ data }) => {
   };
 
   const handleDelete = () => {
-    console.log("Delete this tasks", data);
-    setIsDeleteMenuOpen(false);
+    deleteTagMutate(
+      { tagId: data._id },
+      {
+        onSuccess: () => {
+          setIsDeleteMenuOpen(false);
+        },
+      }
+    );
   };
+
+  useEffect(() => {
+    console.log("delete menu state", isDeleteMenuOpen);
+  }, [isDeleteMenuOpen]);
 
   return (
     <>
@@ -77,6 +90,7 @@ export const TagsDropdownMenu = ({ data }) => {
           title={"Delete Tag"}
           description={`After deletion, the tag "${data.name}" will be removed from all tasks.`}
           handleDelete={handleDelete}
+          isDeleting={isTagDeleting}
         />
       )}
       {isEditFormOpen && (

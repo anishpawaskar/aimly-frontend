@@ -1,4 +1,4 @@
-import { createTag, getTags, updateTag } from "@/services/tags";
+import { createTag, deleteTag, getTags, updateTag } from "@/services/tags";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 export const useCreateTag = () => {
@@ -107,5 +107,27 @@ export const useGetTags = () => {
   return useQuery({
     queryKey: ["tags"],
     queryFn: getTags,
+  });
+};
+
+export const useDeleteTag = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ tagId }) => deleteTag(tagId),
+    onSuccess: (_data, { tagId }, _context) => {
+      queryClient.setQueryData(["tags"], (oldData) => {
+        const filteredTags = oldData.data.tags.filter(
+          (tag) => tag._id !== tagId
+        );
+
+        return {
+          ...oldData,
+          data: {
+            tags: filteredTags,
+          },
+        };
+      });
+    },
   });
 };
