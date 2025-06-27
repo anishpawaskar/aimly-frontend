@@ -1,6 +1,7 @@
 import axiosInstance from "@/config/api";
 import {
   createProjectEndpoint,
+  deleteProjectEndpoint,
   getProjectsEndpoint,
   updateProjectEndpoint,
 } from "@/constants/api-endpoints";
@@ -47,6 +48,21 @@ export const updateProject = async (projectId, payload) => {
     if (axios.isAxiosError(error)) {
       const message =
         error.response?.data?.message || "Error while updating project.";
+      throw new Error(message);
+    }
+
+    throw error;
+  }
+};
+
+export const deleteProject = async (projectId) => {
+  try {
+    const res = await axiosInstance.delete(deleteProjectEndpoint(projectId));
+    return res.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      const message =
+        error.response?.data?.message || "Error while deleting project.";
       throw new Error(message);
     }
 

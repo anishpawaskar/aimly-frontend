@@ -1,4 +1,8 @@
-import { createProject, updateProject } from "@/services/projects";
+import {
+  createProject,
+  deleteProject,
+  updateProject,
+} from "@/services/projects";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 export const useCreateProject = () => {
@@ -89,6 +93,42 @@ export const useUpdateProject = () => {
           };
         });
       }
+    },
+  });
+};
+
+export const useDeleteProject = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ projectId }) => deleteProject(projectId),
+    onMutate: async (variables) => {
+      await queryClient.cancelQueries(["projects"]);
+
+      const previousProjectsData = queryClient.getQueryData(["projects"]);
+
+      queryClient.setQueryData(["projects"], (oldData) => {
+        const filteredProjects = oldData.data.projects.filter(
+          (project) => project._id !== variables.projectId
+        );
+
+        return {
+          ...oldData,
+          data: {
+            projects: filteredProjects,
+          },
+        };
+      });
+
+      const updatedProjectsData = queryClient.getQueryData(["projects"]);
+
+      return { previousProjectsData, updatedProjectsData };
+    },
+    onError: (_error, _variables, context) => {
+      queryClient.setQueryData(["projects", context.previousProjectsData]);
+    },
+    onSuccess: (_data, _variables, context) => {
+      queryClient.setQueryData(["projects"], context.updatedProjectsData);
     },
   });
 };
