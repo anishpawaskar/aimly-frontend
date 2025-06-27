@@ -52,10 +52,6 @@ export const TagsDropdownMenu = ({ data }) => {
     );
   };
 
-  useEffect(() => {
-    console.log("delete menu state", isDeleteMenuOpen);
-  }, [isDeleteMenuOpen]);
-
   return (
     <>
       <DropdownMenu open={isMenuOpen} onOpenChange={setIsMenuOpen}>
