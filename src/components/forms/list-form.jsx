@@ -15,7 +15,7 @@ import {
   Smile,
 } from "lucide-react";
 import { Input } from "../primitive/input";
-import { cn, generateSortOrder } from "@/lib/utils";
+import { cn, generateSortOrder, validateInputs } from "@/lib/utils";
 import { ColorPicker } from "../common/color-picker";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../primitive/tooltip";
 import { BASE_INTERVAL } from "@/constants";
@@ -49,7 +49,7 @@ const ListForm = ({ data, onOpenChange }) => {
     color: data?.color || "",
     viewType: data?.viewType || "list",
   });
-  const [validationError, setValidationError] = useState({
+  const [validationErrors, setValidationErrors] = useState({
     name: "",
   });
   const [isInputFocus, setIsInputFocus] = useState(false);
@@ -70,7 +70,7 @@ const ListForm = ({ data, onOpenChange }) => {
       color: "",
       viewType: "list",
     });
-    setValidationError({
+    setValidationErrors({
       name: "",
     });
   };
@@ -80,23 +80,45 @@ const ListForm = ({ data, onOpenChange }) => {
       ...prevFormData,
       color: color ?? "",
     }));
-    setValidationError((prevErrors) => ({
+    setValidationErrors((prevErrors) => ({
       ...prevErrors,
       name: "",
     }));
   };
 
-  const handleSubmit = () => {
-    const isExistingProject = projects.find(
-      (project) =>
-        project._id !== data._id &&
-        project.name.toLowerCase() === formData.name.toLowerCase().trim()
-    );
+  const validateForm = () => {
+    const valuesToValidate = {
+      name: formData.name.trim(),
+    };
 
-    if (isExistingProject) {
-      setValidationError((prevErrors) => ({
-        ...prevErrors,
-        name: "This list name is already exist.",
+    const defaultErrors = {
+      name: "Name can't be empty.",
+    };
+
+    let errors = validateInputs(valuesToValidate, defaultErrors);
+
+    if (data) {
+      const isExistingProject = projects.find(
+        (project) =>
+          project._id !== data._id &&
+          project.name.toLowerCase() === formData.name.toLowerCase().trim()
+      );
+
+      if (isExistingProject) {
+        errors.name = "This list name is already exist.";
+      }
+    }
+
+    return errors;
+  };
+
+  const handleSubmit = () => {
+    const errors = validateForm();
+
+    if (Object.values(errors).some(Boolean)) {
+      setValidationErrors((prevValidationErrors) => ({
+        ...prevValidationErrors,
+        ...errors,
       }));
       return;
     }
@@ -170,15 +192,15 @@ const ListForm = ({ data, onOpenChange }) => {
                   ...prevFormData,
                   name: e.target.value,
                 }));
-                setValidationError((prevErrors) => ({
+                setValidationErrors((prevErrors) => ({
                   ...prevErrors,
                   name: "",
                 }));
               }}
             />
           </div>
-          {validationError.name && (
-            <p className="text-xs text-wran-red">{validationError.name}</p>
+          {validationErrors.name && (
+            <p className="text-xs text-wran-red">{validationErrors.name}</p>
           )}
         </div>
         <ColorPicker
@@ -207,7 +229,7 @@ const ListForm = ({ data, onOpenChange }) => {
                           ...prevFormData,
                           viewType: view.value,
                         }));
-                        setValidationError((prevErrors) => ({
+                        setValidationErrors((prevErrors) => ({
                           ...prevErrors,
                           name: "",
                         }));
