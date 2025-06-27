@@ -19,11 +19,8 @@ import { cn, generateSortOrder, validateInputs } from "@/lib/utils";
 import { ColorPicker } from "../common/color-picker";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../primitive/tooltip";
 import { BASE_INTERVAL } from "@/constants";
-import { v4 as uuidV4 } from "uuid";
-// import { useTasksSidenav } from "@/context/tasks-sidenav-provider";
-import { useTaskPage } from "@/context/task-page-provider";
 import { useNavigate } from "react-router";
-import { useCreateProject } from "@/hooks/mutations/projects";
+import { useCreateProject, useUpdateProject } from "@/hooks/mutations/projects";
 import { useGetProjects } from "@/hooks/queries/projects";
 
 const PROJECT_VIEW_TYPE = [
@@ -55,15 +52,17 @@ const ListForm = ({ data, onOpenChange }) => {
   });
   const [isInputFocus, setIsInputFocus] = useState(false);
 
-  const { mutate: createProjectMutate, isPendning: isProjectCreating } =
+  const { mutate: createProjectMutate, isPending: isProjectCreating } =
     useCreateProject();
+  const { mutate: updateProjectMutate, isPending: isProjectUpdating } =
+    useUpdateProject();
   const { data: projectsData } = useGetProjects();
-
   const projects = projectsData?.data?.projects || [];
-  const isPending = isProjectCreating;
 
-  // const { items, setItems } = useTasksSidenav();
-  const { setProjects } = useTaskPage();
+  const submitBtnName = data ? "Save" : "Add";
+  const loadingBtnName = submitBtnName === "Save" ? "Saving..." : "Adding...";
+  const isPending = isProjectCreating || isProjectUpdating;
+
   const navigate = useNavigate();
 
   const nameInputRef = useRef(null);
@@ -128,12 +127,17 @@ const ListForm = ({ data, onOpenChange }) => {
     }
 
     if (data) {
-      const updatedProjects = projects.map((project) =>
-        project._id === data._id
-          ? { ...project, ...formData, name: formData.name.trim() }
-          : project
-      );
-      setProjects(updatedProjects);
+      formData.name = formData.name.trim();
+
+      updateProjectMutate({
+        projectId: data._id,
+        payload: formData,
+        optimistic: true,
+      });
+
+      navigate(`/projects/${data._id}/tasks`);
+      resetState();
+      onOpenChange(false);
     } else {
       let sortOrder;
 
@@ -267,7 +271,7 @@ const ListForm = ({ data, onOpenChange }) => {
             disabled={formData.name === "" || isPending}
             onClick={handleSubmit}
           >
-            Add
+            {isPending ? loadingBtnName : submitBtnName}
           </Button>
         </AlertDialogAction>
       </AlertDialogFooter>
