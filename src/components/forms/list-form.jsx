@@ -23,6 +23,7 @@ import { v4 as uuidV4 } from "uuid";
 // import { useTasksSidenav } from "@/context/tasks-sidenav-provider";
 import { useTaskPage } from "@/context/task-page-provider";
 import { useNavigate } from "react-router";
+import { useCreateProject } from "@/hooks/mutations/projects";
 
 const PROJECT_VIEW_TYPE = [
   {
@@ -52,6 +53,10 @@ const ListForm = ({ data, onOpenChange }) => {
     name: "",
   });
   const [isInputFocus, setIsInputFocus] = useState(false);
+
+  const { mutate: createProjectMutate, isPendning: isProjectCreating } =
+    useCreateProject();
+  const isPending = isProjectCreating;
 
   // const { items, setItems } = useTasksSidenav();
   const { projects, setProjects } = useTaskPage();
@@ -112,15 +117,20 @@ const ListForm = ({ data, onOpenChange }) => {
         sortOrder = -BASE_INTERVAL;
       }
 
-      formData._id = uuidV4();
       formData.sortOrder = sortOrder;
       formData.name = formData.name.trim();
-      setProjects((prevItems) => [...prevItems, formData]);
-    }
 
-    navigate(`/projects/${data?._id || formData._id}/tasks`);
-    resetState();
-    onOpenChange(false);
+      createProjectMutate(
+        { payload: formData },
+        {
+          onSuccess: (data) => {
+            navigate(`/projects/${data.data?._id}/tasks`);
+            resetState();
+            onOpenChange(false);
+          },
+        }
+      );
+    }
   };
 
   const handleCancel = () => {
@@ -228,7 +238,7 @@ const ListForm = ({ data, onOpenChange }) => {
         <AlertDialogAction asChild>
           <Button
             variant={"primary"}
-            disabled={formData.name === ""}
+            disabled={formData.name === "" || isPending}
             onClick={handleSubmit}
           >
             Add
