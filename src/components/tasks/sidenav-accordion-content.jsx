@@ -10,10 +10,12 @@ import {
 import { useRef } from "react";
 import { useTasksSidenavData } from "@/hooks/queries/tasksSidenav";
 import { useUpdateTag } from "@/hooks/mutations/tags";
+import { useUpdateProject } from "@/hooks/mutations/projects";
 
 export const SidenavAccordionContent = ({ item }) => {
   const { data: queryData } = useTasksSidenavData(item);
-  const { mutate } = useUpdateTag();
+  const { mutate: updateTagMutate } = useUpdateTag();
+  const { mutate: updateProjectMutate } = useUpdateProject();
   const data = queryData?.data?.[item.dataKey] ?? [];
 
   const totalCountKey =
@@ -76,7 +78,19 @@ export const SidenavAccordionContent = ({ item }) => {
       sortOrder: newSortOrder,
     };
 
-    mutate({ tagId: dragItemRef.current, payload, optimistic: true });
+    if (item.value === "lists") {
+      updateProjectMutate({
+        projectId: dragItemRef.current,
+        payload,
+        optimistic: true,
+      });
+    } else {
+      updateTagMutate({
+        tagId: dragItemRef.current,
+        payload,
+        optimistic: true,
+      });
+    }
   };
 
   return (
