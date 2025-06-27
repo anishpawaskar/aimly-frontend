@@ -24,6 +24,7 @@ import { v4 as uuidV4 } from "uuid";
 import { useTaskPage } from "@/context/task-page-provider";
 import { useNavigate } from "react-router";
 import { useCreateProject } from "@/hooks/mutations/projects";
+import { useGetProjects } from "@/hooks/queries/projects";
 
 const PROJECT_VIEW_TYPE = [
   {
@@ -56,10 +57,13 @@ const ListForm = ({ data, onOpenChange }) => {
 
   const { mutate: createProjectMutate, isPendning: isProjectCreating } =
     useCreateProject();
+  const { data: projectsData } = useGetProjects();
+
+  const projects = projectsData?.data?.projects || [];
   const isPending = isProjectCreating;
 
   // const { items, setItems } = useTasksSidenav();
-  const { projects, setProjects } = useTaskPage();
+  const { setProjects } = useTaskPage();
   const navigate = useNavigate();
 
   const nameInputRef = useRef(null);
