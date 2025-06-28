@@ -13,6 +13,7 @@ import {
 } from "./task-dropdown-menu";
 import { useTaskPage } from "@/context/task-page-provider";
 import {
+  cn,
   moveToBottomSortOrder,
   moveToMiddleSortOrder,
   moveToTopSortOrder,
@@ -236,17 +237,24 @@ const TaskListItem = ({ task, handleDragStart, handleDragEnter }) => {
         <span className="task-title text-sm grow truncate">{task.title}</span>
       </Link>
       <div className="shrink-0 flex items-center gap-1.5">
-        {!!!task.tags.length && (
+        {!!task.tags.length && (
           <div className="tags-wrapper hidden shrink-0 sm:flex items-center gap-1.5">
             {task.tags.slice(0, 2).map((tag) => {
+              const styles = {};
+
+              if (tag.color) {
+                styles.background = tag.color + "80";
+              }
+
               return (
                 <Link
-                  style={{
-                    background: tag.color,
-                  }}
+                  style={styles}
                   to={`/tags/${tag._id}/tasks`}
                   key={tag._id}
-                  className="text-xs h-5 flex justify-center items-center max-w-[88px] rounded-full truncate text-gray/60 px-2 break-all"
+                  className={cn(
+                    "text-xs h-5 flex justify-center items-center max-w-[88px] rounded-full truncate text-gray/60 px-2 break-all",
+                    !tag.color && `bg-primary/50`
+                  )}
                 >
                   {tag.name}
                 </Link>
