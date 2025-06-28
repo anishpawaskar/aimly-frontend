@@ -17,4 +17,4 @@ export const createTagEndpoint = "/v1/tags";
 export const getTagsEndpoint = "/v1/tags";
 export const updateTagEndpoint = (tagId) => `/v1/tags/${tagId}`;
 export const deleteTagEndpoint = (tagId) => `/v1/tags/${tagId}`;
-export const getTagWithDataEndpoint = (tagId) => `/v1/tag/${tagId}/data`;
+export const getTagWithDataEndpoint = (tagId) => `/v1/tags/${tagId}/data`;
