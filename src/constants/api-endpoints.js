@@ -9,6 +9,8 @@ export const createProjectEndpoint = "/v1/projects";
 export const getProjectsEndpoint = "/v1/projects";
 export const updateProjectEndpoint = (projectId) => `/v1/projects/${projectId}`;
 export const deleteProjectEndpoint = (projectId) => `/v1/projects/${projectId}`;
+export const getProjectWithDataEndpoint = (projectId) =>
+  `/v1/projects/${projectId}/data`;
 
 // tags
 export const createTagEndpoint = "/v1/tags";

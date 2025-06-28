@@ -69,3 +69,18 @@ export const deleteProject = async (projectId) => {
     throw error;
   }
 };
+
+export const getProjectWithData = async (projectId) => {
+  try {
+    const res = await axiosInstance.get(getProjectWithData(projectId));
+    return res.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      const message =
+        error.response?.data?.message || "Error while deleting project.";
+      throw new Error(message);
+    }
+
+    throw error;
+  }
+};
