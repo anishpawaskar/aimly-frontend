@@ -11,11 +11,15 @@ import { Button } from "@/components/primitive/button";
 import DeleteDialog from "@/components/common/delete-dialog";
 import { AlertDialog } from "@/components/primitive/alert-dialog";
 import ListForm from "@/components/forms/list-form";
+import { useDeleteProject } from "@/hooks/mutations/projects";
 
 export const ProjectsDropdownMenu = ({ data }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isEditFormOpen, setIsEditFormOpen] = useState(false);
   const [isDeleteMenuOpen, setIsDeleteMenuOpen] = useState(false);
+
+  const { mutate: deleteProjectMutate, isPending: isProjectDeleting } =
+    useDeleteProject();
 
   const handleMenuItem = (name) => {
     switch (name) {
@@ -34,7 +38,8 @@ export const ProjectsDropdownMenu = ({ data }) => {
   };
 
   const handleDelete = () => {
-    console.log("Dleete project", data);
+    // console.log("Dleete project", data);
+    deleteProjectMutate({ projectId: data._id });
     setIsDeleteMenuOpen(false);
   };
 
@@ -72,6 +77,7 @@ export const ProjectsDropdownMenu = ({ data }) => {
           title={`Delete list`}
           description={`All tasks in the list "${data.name}" will be deleted.`}
           handleDelete={handleDelete}
+          isDeleting={isProjectDeleting}
         />
       )}
       {isEditFormOpen && (

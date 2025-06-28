@@ -15,6 +15,7 @@ const DeleteDialog = ({
   title,
   description,
   handleDelete,
+  isDeleting,
 }) => {
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
@@ -24,7 +25,9 @@ const DeleteDialog = ({
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
           <AlertDialogAction asChild>
-            <Button onClick={handleDelete}>Delete</Button>
+            <Button onClick={handleDelete} disabled={isDeleting}>
+              {isDeleting ? "Deleting..." : "Delete"}
+            </Button>
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

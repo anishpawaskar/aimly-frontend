@@ -15,14 +15,13 @@ import {
   Smile,
 } from "lucide-react";
 import { Input } from "../primitive/input";
-import { cn, generateSortOrder } from "@/lib/utils";
+import { cn, generateSortOrder, validateInputs } from "@/lib/utils";
 import { ColorPicker } from "../common/color-picker";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../primitive/tooltip";
 import { BASE_INTERVAL } from "@/constants";
-import { v4 as uuidV4 } from "uuid";
-// import { useTasksSidenav } from "@/context/tasks-sidenav-provider";
-import { useTaskPage } from "@/context/task-page-provider";
 import { useNavigate } from "react-router";
+import { useCreateProject, useUpdateProject } from "@/hooks/mutations/projects";
+import { useGetProjects } from "@/hooks/queries/projects";
 
 const PROJECT_VIEW_TYPE = [
   {
@@ -48,13 +47,22 @@ const ListForm = ({ data, onOpenChange }) => {
     color: data?.color || "",
     viewType: data?.viewType || "list",
   });
-  const [validationError, setValidationError] = useState({
+  const [validationErrors, setValidationErrors] = useState({
     name: "",
   });
   const [isInputFocus, setIsInputFocus] = useState(false);
 
-  // const { items, setItems } = useTasksSidenav();
-  const { projects, setProjects } = useTaskPage();
+  const { mutate: createProjectMutate, isPending: isProjectCreating } =
+    useCreateProject();
+  const { mutate: updateProjectMutate, isPending: isProjectUpdating } =
+    useUpdateProject();
+  const { data: projectsData } = useGetProjects();
+  const projects = projectsData?.data?.projects || [];
+
+  const submitBtnName = data ? "Save" : "Add";
+  const loadingBtnName = submitBtnName === "Save" ? "Saving..." : "Adding...";
+  const isPending = isProjectCreating || isProjectUpdating;
+
   const navigate = useNavigate();
 
   const nameInputRef = useRef(null);
@@ -65,7 +73,7 @@ const ListForm = ({ data, onOpenChange }) => {
       color: "",
       viewType: "list",
     });
-    setValidationError({
+    setValidationErrors({
       name: "",
     });
   };
@@ -75,34 +83,61 @@ const ListForm = ({ data, onOpenChange }) => {
       ...prevFormData,
       color: color ?? "",
     }));
-    setValidationError((prevErrors) => ({
+    setValidationErrors((prevErrors) => ({
       ...prevErrors,
       name: "",
     }));
   };
 
-  const handleSubmit = () => {
-    const isExistingProject = projects.find(
-      (project) =>
-        project._id !== data._id &&
-        project.name.toLowerCase() === formData.name.toLowerCase().trim()
-    );
+  const validateForm = () => {
+    const valuesToValidate = {
+      name: formData.name.trim(),
+    };
 
-    if (isExistingProject) {
-      setValidationError((prevErrors) => ({
-        ...prevErrors,
-        name: "This list name is already exist.",
+    const defaultErrors = {
+      name: "Name can't be empty.",
+    };
+
+    let errors = validateInputs(valuesToValidate, defaultErrors);
+
+    if (data) {
+      const isExistingProject = projects.find(
+        (project) =>
+          project._id !== data._id &&
+          project.name.toLowerCase() === formData.name.toLowerCase().trim()
+      );
+
+      if (isExistingProject) {
+        errors.name = "This list name is already exist.";
+      }
+    }
+
+    return errors;
+  };
+
+  const handleSubmit = () => {
+    const errors = validateForm();
+
+    if (Object.values(errors).some(Boolean)) {
+      setValidationErrors((prevValidationErrors) => ({
+        ...prevValidationErrors,
+        ...errors,
       }));
       return;
     }
 
     if (data) {
-      const updatedProjects = projects.map((project) =>
-        project._id === data._id
-          ? { ...project, ...formData, name: formData.name.trim() }
-          : project
-      );
-      setProjects(updatedProjects);
+      formData.name = formData.name.trim();
+
+      updateProjectMutate({
+        projectId: data._id,
+        payload: formData,
+        optimistic: true,
+      });
+
+      navigate(`/projects/${data._id}/tasks`);
+      resetState();
+      onOpenChange(false);
     } else {
       let sortOrder;
 
@@ -112,15 +147,20 @@ const ListForm = ({ data, onOpenChange }) => {
         sortOrder = -BASE_INTERVAL;
       }
 
-      formData._id = uuidV4();
       formData.sortOrder = sortOrder;
       formData.name = formData.name.trim();
-      setProjects((prevItems) => [...prevItems, formData]);
-    }
 
-    navigate(`/projects/${data?._id || formData._id}/tasks`);
-    resetState();
-    onOpenChange(false);
+      createProjectMutate(
+        { payload: formData },
+        {
+          onSuccess: (data) => {
+            navigate(`/projects/${data.data?._id}/tasks`);
+            resetState();
+            onOpenChange(false);
+          },
+        }
+      );
+    }
   };
 
   const handleCancel = () => {
@@ -160,15 +200,15 @@ const ListForm = ({ data, onOpenChange }) => {
                   ...prevFormData,
                   name: e.target.value,
                 }));
-                setValidationError((prevErrors) => ({
+                setValidationErrors((prevErrors) => ({
                   ...prevErrors,
                   name: "",
                 }));
               }}
             />
           </div>
-          {validationError.name && (
-            <p className="text-xs text-wran-red">{validationError.name}</p>
+          {validationErrors.name && (
+            <p className="text-xs text-wran-red">{validationErrors.name}</p>
           )}
         </div>
         <ColorPicker
@@ -197,7 +237,7 @@ const ListForm = ({ data, onOpenChange }) => {
                           ...prevFormData,
                           viewType: view.value,
                         }));
-                        setValidationError((prevErrors) => ({
+                        setValidationErrors((prevErrors) => ({
                           ...prevErrors,
                           name: "",
                         }));
@@ -228,10 +268,10 @@ const ListForm = ({ data, onOpenChange }) => {
         <AlertDialogAction asChild>
           <Button
             variant={"primary"}
-            disabled={formData.name === ""}
+            disabled={formData.name === "" || isPending}
             onClick={handleSubmit}
           >
-            Add
+            {isPending ? loadingBtnName : submitBtnName}
           </Button>
         </AlertDialogAction>
       </AlertDialogFooter>

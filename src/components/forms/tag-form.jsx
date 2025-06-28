@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { ColorPicker } from "../common/color-picker";
 import {
   AlertDialogAction,
@@ -10,11 +10,11 @@ import {
 import { Input } from "../primitive/input";
 import { Button } from "../primitive/button";
 import { BASE_INTERVAL } from "@/constants";
-import { generateSortOrder } from "@/lib/utils";
+import { generateSortOrder, validateInputs } from "@/lib/utils";
 import { v4 as uuidV4 } from "uuid";
-// import { useTasksSidenav } from "@/context/tasks-sidenav-provider";
-import { useTaskPage } from "@/context/task-page-provider";
 import { useNavigate } from "react-router";
+import { useCreateTag, useUpdateTag } from "@/hooks/mutations/tags";
+import { useGetTags } from "@/hooks/queries/tags";
 
 const TagForm = ({ data, onOpenChange }) => {
   const [formData, setFormData] = useState({
@@ -25,8 +25,15 @@ const TagForm = ({ data, onOpenChange }) => {
     name: "",
   });
 
-  // const { items, setItems } = useTasksSidenav();
-  const { tags, setTags } = useTaskPage();
+  const { mutate: updateTagMutate, isPending: isTagUpdating } = useUpdateTag();
+  const { mutate: createTagMutate, isPending: isTagCreating } = useCreateTag();
+  const { data: tagsData } = useGetTags();
+  const tags = tagsData?.data.tags ?? [];
+
+  const submitBtnName = data ? "Save" : "Add";
+  const loadingBtnName = submitBtnName === "Save" ? "Saving..." : "Adding...";
+  const isPending = isTagUpdating || isTagCreating;
+
   const navigate = useNavigate();
 
   const resetState = () => {
@@ -51,28 +58,61 @@ const TagForm = ({ data, onOpenChange }) => {
     }));
   };
 
-  const handleSubmit = () => {
-    const isExistingTag = tags.find(
-      (tag) =>
-        tag._id !== data._id &&
-        tag.name.toLowerCase().trim() === formData.name.toLowerCase().trim()
-    );
+  const validateForm = () => {
+    const valuesToValidate = {
+      name: formData.name,
+    };
 
-    if (isExistingTag) {
-      setValidationError((prevErrors) => ({
-        ...prevErrors,
-        name: `Tag name ${formData.name} is already taken.`,
+    const defaultErrors = {
+      name: "Name can't be empty.",
+    };
+
+    let errors = validateInputs(valuesToValidate, defaultErrors);
+
+    const tagNameRegex = /^[^\\\/"#:\*\?<>\|\s]+$/;
+
+    if (!tagNameRegex.test(formData.name) && formData.name) {
+      errors.name = `Tag name can't contain \ / " # : * ? < > | Space.`;
+      return errors;
+    }
+
+    if (data) {
+      const isExistingTag = tags.find(
+        (tag) =>
+          tag._id !== data._id &&
+          tag.name.toLowerCase().trim() === formData.name.toLowerCase().trim()
+      );
+
+      if (isExistingTag) {
+        errors.name = "Tag name is already taken.";
+      }
+    }
+
+    return errors;
+  };
+
+  const handleSubmit = () => {
+    const errors = validateForm();
+
+    if (Object.values(errors).some(Boolean)) {
+      setValidationError((prevValidationErrors) => ({
+        ...prevValidationErrors,
+        ...errors,
       }));
       return;
     }
 
     if (data) {
-      const updatedTags = tags.map((tag) =>
-        tag._id === data._id
-          ? { ...tag, ...formData, name: formData.name.trim() }
-          : tag
+      updateTagMutate(
+        { tagId: data?._id, payload: formData },
+        {
+          onSuccess: () => {
+            resetState();
+            onOpenChange(false);
+            // navigate(`/tags/${data?._id}/tasks`);
+          },
+        }
       );
-      setTags(updatedTags);
     } else {
       let sortOrder;
 
@@ -85,12 +125,11 @@ const TagForm = ({ data, onOpenChange }) => {
       formData._id = uuidV4();
       formData.sortOrder = sortOrder;
       formData.name = formData.name.trim();
-      setTags((prevItems) => [...prevItems, formData]);
-    }
 
-    navigate(`/tags/${data?._id || formData._id}/tasks`);
-    resetState();
-    onOpenChange(false);
+      createTagMutate({ payload: formData });
+      resetState();
+      onOpenChange(false);
+    }
   };
 
   const handleCancel = () => {
@@ -137,10 +176,10 @@ const TagForm = ({ data, onOpenChange }) => {
         <AlertDialogAction asChild>
           <Button
             variant={"primary"}
-            disabled={formData.name === ""}
+            disabled={formData.name === "" || isPending}
             onClick={handleSubmit}
           >
-            Add
+            {isPending ? loadingBtnName : submitBtnName}
           </Button>
         </AlertDialogAction>
       </AlertDialogFooter>

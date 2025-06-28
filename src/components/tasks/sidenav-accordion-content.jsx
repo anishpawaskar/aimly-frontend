@@ -1,7 +1,6 @@
 import { AlignJustify } from "lucide-react";
 import { AccordionContent } from "../primitive/accordion";
 import { NavLink, useLocation } from "react-router";
-import { useTasksSidenav } from "@/context/tasks-sidenav-provider";
 import {
   cn,
   moveToBottomSortOrder,
@@ -9,25 +8,19 @@ import {
   moveToTopSortOrder,
 } from "@/lib/utils";
 import { useRef } from "react";
-import { useTaskPage } from "@/context/task-page-provider";
-import { useQuery } from "@tanstack/react-query";
+import { useTasksSidenavData } from "@/hooks/queries/tasksSidenav";
+import { useUpdateTag } from "@/hooks/mutations/tags";
+import { useUpdateProject } from "@/hooks/mutations/projects";
 
 export const SidenavAccordionContent = ({ item }) => {
-  // const { items, setItems } = useTasksSidenav();
-  // const { projects, setProjects, tags, setTags } = useTaskPage();
-
-  const { data: queryData } = useQuery({
-    queryKey: item.queryKey,
-    queryFn: item.queryFn,
-  });
+  const { data: queryData } = useTasksSidenavData(item);
+  const { mutate: updateTagMutate } = useUpdateTag();
+  const { mutate: updateProjectMutate } = useUpdateProject();
+  const data = queryData?.data?.[item.dataKey] ?? [];
 
   const totalCountKey =
     item.value === "lists" ? "totalAssignTasks" : "assignTaskCount";
 
-  // const items = item.value === "lists" ? projects : tags;
-  // const setItems = item.value === "lists" ? setProjects : setTags;
-
-  const data = queryData ? [...queryData?.data?.[item.dataKey]] : [];
   const SidenavDropdownMenu = item.dropdownMenu;
 
   const location = useLocation();
@@ -44,7 +37,7 @@ export const SidenavAccordionContent = ({ item }) => {
   };
 
   const handleDrop = () => {
-    const newItems = [...items];
+    const newItems = [...data];
     newItems.sort((a, b) => a.sortOrder - b.sortOrder);
 
     const beforeItemIndex = newItems.findIndex(
@@ -62,29 +55,42 @@ export const SidenavAccordionContent = ({ item }) => {
 
     if (!afterItem) {
       newSortOrder = moveToBottomSortOrder({
-        items,
+        items: data,
         itemId: dragItemRef.current,
       });
     }
 
     if (beforeItem && afterItem) {
       newSortOrder = moveToMiddleSortOrder({
-        items,
+        items: data,
         afterItemId: afterItem._id,
         beforeItemId: beforeItem._id,
       });
     }
 
-    if (items.length > 0 && beforeItemIndex === 0) {
-      newSortOrder = moveToTopSortOrder({ items });
+    if (data.length > 0 && beforeItemIndex === 0) {
+      newSortOrder = moveToTopSortOrder({
+        items: data,
+      });
     }
 
-    const updatedItems = items.map((item) =>
-      item._id === dragItemRef.current
-        ? { ...item, sortOrder: newSortOrder }
-        : item
-    );
-    setItems(updatedItems);
+    const payload = {
+      sortOrder: newSortOrder,
+    };
+
+    if (item.value === "lists") {
+      updateProjectMutate({
+        projectId: dragItemRef.current,
+        payload,
+        optimistic: true,
+      });
+    } else {
+      updateTagMutate({
+        tagId: dragItemRef.current,
+        payload,
+        optimistic: true,
+      });
+    }
   };
 
   return (
@@ -102,7 +108,7 @@ export const SidenavAccordionContent = ({ item }) => {
             {item.fallbackText}
           </li>
         ) : (
-          data
+          [...data]
             .sort((a, b) => a.sortOrder - b.sortOrder)
             .map((dataItem) => {
               const isActive =
