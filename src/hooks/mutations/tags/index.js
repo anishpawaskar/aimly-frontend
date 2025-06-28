@@ -1,5 +1,5 @@
-import { createTag, deleteTag, getTags, updateTag } from "@/services/tags";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { createTag, deleteTag, updateTag } from "@/services/tags";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 export const useCreateTag = () => {
   const queryClient = useQueryClient();
