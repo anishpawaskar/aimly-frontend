@@ -103,13 +103,6 @@ export const useUpdateTag = () => {
   });
 };
 
-export const useGetTags = () => {
-  return useQuery({
-    queryKey: ["tags"],
-    queryFn: getTags,
-  });
-};
-
 export const useDeleteTag = () => {
   const queryClient = useQueryClient();
 

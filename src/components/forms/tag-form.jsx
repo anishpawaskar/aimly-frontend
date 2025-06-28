@@ -13,7 +13,8 @@ import { BASE_INTERVAL } from "@/constants";
 import { generateSortOrder, validateInputs } from "@/lib/utils";
 import { v4 as uuidV4 } from "uuid";
 import { useNavigate } from "react-router";
-import { useCreateTag, useGetTags, useUpdateTag } from "@/hooks/mutations/tags";
+import { useCreateTag, useUpdateTag } from "@/hooks/mutations/tags";
+import { useGetTags } from "@/hooks/queries/tags";
 
 const TagForm = ({ data, onOpenChange }) => {
   const [formData, setFormData] = useState({
