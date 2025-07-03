@@ -5,5 +5,6 @@ export const useGetUserSelfDetails = () => {
   return useQuery({
     queryKey: ["userSelfDetails"],
     queryFn: getUserSelfDetails,
+    retry: 0,
   });
 };
