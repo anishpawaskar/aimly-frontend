@@ -6,5 +6,6 @@ export const useGetUserSelfDetails = () => {
     queryKey: ["userSelfDetails"],
     queryFn: getUserSelfDetails,
     retry: 0,
+    refetchOnWindowFocus: false,
   });
 };
