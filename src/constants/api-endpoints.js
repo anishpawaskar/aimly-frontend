@@ -4,6 +4,9 @@ export const userSignupEndpoint = "/v1/auth/signup";
 // auth - signin
 export const userSigninEndpoint = "/v1/auth/signin";
 
+// auth - me
+export const userSelfDetailsEndpoint = "/v1/auth/me";
+
 // projects
 export const createProjectEndpoint = "/v1/projects";
 export const getProjectsEndpoint = "/v1/projects";
