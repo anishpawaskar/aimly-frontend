@@ -21,3 +21,6 @@ export const getTagWithDataEndpoint = (tagId) => `/v1/tags/${tagId}/data`;
 
 // tasks
 export const createTaskEndpoint = `/v1/tasks`;
+
+//user-settings
+export const getUserSettingsEndpoint = "/v1/user/settings";
