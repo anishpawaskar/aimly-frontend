@@ -13,6 +13,7 @@ import {
 } from "./task-dropdown-menu";
 import { useTaskPage } from "@/context/task-page-provider";
 import {
+  cn,
   moveToBottomSortOrder,
   moveToMiddleSortOrder,
   moveToTopSortOrder,
@@ -45,8 +46,8 @@ const PRIORITIES = [
   },
 ];
 
-export const TasksList = () => {
-  const { tasks, setTasks } = useTaskPage();
+export const TasksList = ({ tasks }) => {
+  // const { tasks, setTasks } = useTaskPage();
 
   const params = useParams();
 
@@ -103,60 +104,60 @@ export const TasksList = () => {
         : task
     );
 
-    setTasks(updatedTaks);
+    // setTasks(updatedTaks);
     dragItemRef.current = null;
     dragOverItemRef.current = null;
   };
 
-  let data;
+  // let data;
 
-  if (params?.projectId) {
-    data = tasks
-      .filter(
-        (task) => task.projectId === params?.projectId && task.status === 0
-      )
-      .map((task) => {
-        const tags = task.tags.map((tagId) => {
-          const existingTag = tags.find((tag) => tag._id === tagId);
+  // if (params?.projectId) {
+  //   data = tasks
+  //     .filter(
+  //       (task) => task.projectId === params?.projectId && task.status === 0
+  //     )
+  //     .map((task) => {
+  //       const tags = task.tags.map((tagId) => {
+  //         const existingTag = tags.find((tag) => tag._id === tagId);
 
-          return {
-            _id: existingTag._id,
-            name: existingTag.name,
-            color: existingTag.color,
-          };
-        });
+  //         return {
+  //           _id: existingTag._id,
+  //           name: existingTag.name,
+  //           color: existingTag.color,
+  //         };
+  //       });
 
-        return {
-          ...task,
-          tags,
-        };
-      })
-      .sort((a, b) => a.sortOrder - b.sortOrder);
-  }
+  //       return {
+  //         ...task,
+  //         tags,
+  //       };
+  //     })
+  //     .sort((a, b) => a.sortOrder - b.sortOrder);
+  // }
 
-  if (params?.tagId) {
-    data = tasks
-      .filter((task) => task.tags.includes(params?.tagId) && task.status === 0)
-      .map((task) => {
-        const tags = task.tags.map((tagId) => {
-          const existingTag = tags.find((tag) => tag._id === tagId);
+  // if (params?.tagId) {
+  //   data = tasks
+  //     .filter((task) => task.tags.includes(params?.tagId) && task.status === 0)
+  //     .map((task) => {
+  //       const tags = task.tags.map((tagId) => {
+  //         const existingTag = tags.find((tag) => tag._id === tagId);
 
-          return {
-            _id: existingTag._id,
-            name: existingTag.name,
-            color: existingTag.color,
-          };
-        });
+  //         return {
+  //           _id: existingTag._id,
+  //           name: existingTag.name,
+  //           color: existingTag.color,
+  //         };
+  //       });
 
-        return {
-          ...task,
-          tags,
-        };
-      })
-      .sort((a, b) => a.sortOrder - b.sortOrder);
-  }
+  //       return {
+  //         ...task,
+  //         tags,
+  //       };
+  //     })
+  //     .sort((a, b) => a.sortOrder - b.sortOrder);
+  // }
 
-  return !!!data.length ? (
+  return !!!tasks.length ? (
     <div className="h-full w-full flex items-center justify-center">
       <h3 className="text-2xl font-semibold">No tasks</h3>
     </div>
@@ -168,7 +169,7 @@ export const TasksList = () => {
       onDrop={handleDrop}
       className="tasks-list overflow-y-auto"
     >
-      {data.map((task) => {
+      {tasks.map((task) => {
         return (
           <TaskListItem
             key={task._id}
@@ -188,7 +189,7 @@ const TaskListItem = ({ task, handleDragStart, handleDragEnter }) => {
   );
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
 
-  const { tasks, setTasks } = useTaskPage();
+  // const { tasks, setTasks } = useTaskPage();
 
   const priority = PRIORITIES.find(
     (priority) => priority.value === task.priority
@@ -203,7 +204,7 @@ const TaskListItem = ({ task, handleDragStart, handleDragEnter }) => {
         : taskItem
     );
 
-    setTasks(updatedTask);
+    // setTasks(updatedTask);
   };
 
   return (
@@ -236,17 +237,24 @@ const TaskListItem = ({ task, handleDragStart, handleDragEnter }) => {
         <span className="task-title text-sm grow truncate">{task.title}</span>
       </Link>
       <div className="shrink-0 flex items-center gap-1.5">
-        {!!!task.tags.length && (
+        {!!task.tags.length && (
           <div className="tags-wrapper hidden shrink-0 sm:flex items-center gap-1.5">
             {task.tags.slice(0, 2).map((tag) => {
+              const styles = {};
+
+              if (tag.color) {
+                styles.background = tag.color + "80";
+              }
+
               return (
                 <Link
-                  style={{
-                    background: tag.color,
-                  }}
+                  style={styles}
                   to={`/tags/${tag._id}/tasks`}
                   key={tag._id}
-                  className="text-xs h-5 flex justify-center items-center max-w-[88px] rounded-full truncate text-gray/60 px-2 break-all"
+                  className={cn(
+                    "text-xs h-5 flex justify-center items-center max-w-[88px] rounded-full truncate text-gray/60 px-2 break-all",
+                    !tag.color && `bg-primary/50`
+                  )}
                 >
                   {tag.name}
                 </Link>

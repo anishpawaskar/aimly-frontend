@@ -3,6 +3,7 @@ import {
   createProjectEndpoint,
   deleteProjectEndpoint,
   getProjectsEndpoint,
+  getProjectWithDataEndpoint,
   updateProjectEndpoint,
 } from "@/constants/api-endpoints";
 import axios from "axios";
@@ -63,6 +64,21 @@ export const deleteProject = async (projectId) => {
     if (axios.isAxiosError(error)) {
       const message =
         error.response?.data?.message || "Error while deleting project.";
+      throw new Error(message);
+    }
+
+    throw error;
+  }
+};
+
+export const getProjectWithData = async (projectId) => {
+  try {
+    const res = await axiosInstance.get(getProjectWithDataEndpoint(projectId));
+    return res.data;
+  } catch (error) {
+    if (axios.isAxiosError(error)) {
+      const message =
+        error.response?.data?.message || "Error while fetching project.";
       throw new Error(message);
     }
 

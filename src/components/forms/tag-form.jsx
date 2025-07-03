@@ -109,7 +109,7 @@ const TagForm = ({ data, onOpenChange }) => {
           onSuccess: () => {
             resetState();
             onOpenChange(false);
-            // navigate(`/tags/${data?._id}/tasks`);
+            navigate(`/tags/${data?._id}/tasks`);
           },
         }
       );
@@ -126,9 +126,16 @@ const TagForm = ({ data, onOpenChange }) => {
       formData.sortOrder = sortOrder;
       formData.name = formData.name.trim();
 
-      createTagMutate({ payload: formData });
-      resetState();
-      onOpenChange(false);
+      createTagMutate(
+        { payload: formData },
+        {
+          onSuccess: (data) => {
+            resetState();
+            onOpenChange(false);
+            navigate(`/tags/${data?.data._id}/tasks`);
+          },
+        }
+      );
     }
   };
 

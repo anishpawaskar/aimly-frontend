@@ -6,45 +6,63 @@ export const useCreateTag = () => {
 
   return useMutation({
     mutationFn: ({ payload }) => createTag(payload),
-    onMutate: async (variables) => {
-      await queryClient.cancelQueries({ queryKey: ["tags"] });
-
-      const previousTags = queryClient.getQueryData(["tags"]);
-
+    onSuccess: (data) => {
       queryClient.setQueryData(["tags"], (oldData) => {
         return {
           ...oldData,
           data: {
-            tags: [...oldData.data.tags, variables.payload],
+            tags: [...oldData.data.tags, data.data],
           },
         };
       });
-
-      const newTags = queryClient.getQueryData(["tags"]);
-
-      return { previousTags, newTags };
-    },
-    onError: (_error, _variables, context) => {
-      queryClient.setQueryData(["tags"], context.previousTags);
-    },
-    onSuccess: (data, { payload }, context) => {
-      const newTagsData = context.newTags;
-
-      const updatedTags = newTagsData.data.tags.map((tag) =>
-        tag._id === payload._id ? { ...tag, _id: data?.data._id } : tag
-      );
-
-      const updatedTagsData = {
-        ...newTagsData,
-        data: {
-          tags: updatedTags,
-        },
-      };
-
-      queryClient.setQueryData(["tags"], updatedTagsData);
     },
   });
 };
+
+// export const useCreateTag = () => {
+//   const queryClient = useQueryClient();
+
+//   return useMutation({
+//     mutationFn: ({ payload }) => createTag(payload),
+//     onMutate: async (variables) => {
+//       await queryClient.cancelQueries({ queryKey: ["tags"] });
+
+//       const previousTags = queryClient.getQueryData(["tags"]);
+
+//       queryClient.setQueryData(["tags"], (oldData) => {
+//         return {
+//           ...oldData,
+//           data: {
+//             tags: [...oldData.data.tags, variables.payload],
+//           },
+//         };
+//       });
+
+//       const newTags = queryClient.getQueryData(["tags"]);
+
+//       return { previousTags, newTags };
+//     },
+//     onError: (_error, _variables, context) => {
+//       queryClient.setQueryData(["tags"], context.previousTags);
+//     },
+//     onSuccess: (data, { payload }, context) => {
+//       const newTagsData = context.newTags;
+
+//       const updatedTags = newTagsData.data.tags.map((tag) =>
+//         tag._id === payload._id ? { ...tag, _id: data?.data._id } : tag
+//       );
+
+//       const updatedTagsData = {
+//         ...newTagsData,
+//         data: {
+//           tags: updatedTags,
+//         },
+//       };
+
+//       queryClient.setQueryData(["tags"], updatedTagsData);
+//     },
+//   });
+// };
 
 export const useUpdateTag = () => {
   const queryClient = useQueryClient();
