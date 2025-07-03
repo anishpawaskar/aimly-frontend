@@ -5,6 +5,8 @@ import AuthLayout from "./pages/auth/layout";
 import Signup from "./pages/auth/signup";
 import DashboardLayout from "./pages/dashboard/layout";
 import TasksLayout from "./pages/tasks/layout";
+import { ProtectedRoute } from "./components/protected-route";
+import { PublicProtectedRoute } from "./components/public-protected-route";
 
 function App() {
   return (
@@ -29,11 +31,23 @@ function App() {
             </div>
           }
         />
-        <Route element={<AuthLayout />}>
+        <Route
+          element={
+            <PublicProtectedRoute>
+              <AuthLayout />
+            </PublicProtectedRoute>
+          }
+        >
           <Route path="signin" element={<Signin />} />
           <Route path="signup" element={<Signup />} />
         </Route>
-        <Route element={<DashboardLayout />}>
+        <Route
+          element={
+            <ProtectedRoute>
+              <DashboardLayout />
+            </ProtectedRoute>
+          }
+        >
           <Route path="/projects/:projectId/tasks" element={<TasksLayout />}>
             <Route
               index
@@ -56,6 +70,14 @@ function App() {
             />
             <Route path=":taskId" element={<div>TaskId</div>} />
           </Route>
+          <Route
+            path="/pomodoro"
+            element={
+              <div>
+                <h1>Pomodoro</h1>
+              </div>
+            }
+          />
         </Route>
       </Routes>
     </>
