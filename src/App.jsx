@@ -33,27 +33,29 @@ function App() {
           <Route path="signin" element={<Signin />} />
           <Route path="signup" element={<Signup />} />
         </Route>
-        <Route path="/projects/:projectId/tasks" element={<TasksLayout />}>
-          <Route
-            index
-            element={
-              <div>
-                <h1>Tasks</h1>
-              </div>
-            }
-          />
-          <Route path=":taskId" element={<div>TaskId</div>} />
-        </Route>
-        <Route path="/tags/:tagId/tasks" element={<TasksLayout />}>
-          <Route
-            index
-            element={
-              <div>
-                <h1>Tasks</h1>
-              </div>
-            }
-          />
-          <Route path=":taskId" element={<div>TaskId</div>} />
+        <Route element={<DashboardLayout />}>
+          <Route path="/projects/:projectId/tasks" element={<TasksLayout />}>
+            <Route
+              index
+              element={
+                <div>
+                  <h1>Tasks</h1>
+                </div>
+              }
+            />
+            <Route path=":taskId" element={<div>TaskId</div>} />
+          </Route>
+          <Route path="/tags/:tagId/tasks" element={<TasksLayout />}>
+            <Route
+              index
+              element={
+                <div>
+                  <h1>Tasks</h1>
+                </div>
+              }
+            />
+            <Route path=":taskId" element={<div>TaskId</div>} />
+          </Route>
         </Route>
       </Routes>
     </>
