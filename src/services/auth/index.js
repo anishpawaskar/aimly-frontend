@@ -1,6 +1,6 @@
 import axiosInstance from "@/config/api";
 import {
-  getUserSettingsEndpoint,
+  userSelfDetailsEndpoint,
   userSigninEndpoint,
   userSignupEndpoint,
 } from "@/constants/api-endpoints";
@@ -34,7 +34,7 @@ export const signinUser = async (data) => {
 
 export const getUserSelfDetails = async () => {
   try {
-    const res = await axiosInstance.get(getUserSettingsEndpoint);
+    const res = await axiosInstance.get(userSelfDetailsEndpoint);
     return res.data;
   } catch (error) {
     if (axios.isAxiosError(error)) {
