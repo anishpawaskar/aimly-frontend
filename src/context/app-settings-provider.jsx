@@ -9,7 +9,7 @@ export const AppSettingsProvider = ({ children }) => {
 
   const contextValue = {
     isSettingFetched: isSuccess,
-    userSettigns: data?.data || null,
+    userSettings: data?.data || null,
     isSettingsFetching: isLoading,
   };
 
