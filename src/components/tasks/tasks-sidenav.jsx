@@ -5,10 +5,14 @@ import { useTheme } from "@/context/theme-provider";
 import { Accordion } from "../primitive/accordion";
 import { TasksSidenavAccordionItem } from "./sidenav-accodion-item";
 import { TasksSidenavProvider } from "@/context/tasks-sidenav-provider";
+import { useAppSettings } from "@/context/app-settings-provider";
+import { Inbox, SquareCheckBig, Trash2 } from "lucide-react";
 
 export const TasksSidenav = () => {
   const { theme } = useTheme();
   const isLight = theme === "light";
+  const { userSettings } = useAppSettings();
+  const smartProjects = userSettings?.smartProjects ?? [];
 
   return (
     <div
@@ -18,13 +22,34 @@ export const TasksSidenav = () => {
       )}
     >
       <div className="flex flex-col">
-        {SMART_LIST.map((item) => {
-          const IconComponent = item.icon;
+        {smartProjects.map((item) => {
+          let IconComponent;
+          let href;
+
+          switch (item.name) {
+            case "Inbox": {
+              IconComponent = Inbox;
+              href = "/projects/inbox/tasks";
+              break;
+            }
+
+            case "Completed": {
+              IconComponent = SquareCheckBig;
+              href = "/completed";
+              break;
+            }
+
+            case "Trash": {
+              IconComponent = Trash2;
+              href = "/trash";
+              break;
+            }
+          }
 
           return (
             <NavLink
               key={item.name}
-              to={item.href}
+              to={href}
               className={({ isActive }) =>
                 cn(
                   "h-9 pl-4 pr-2 flex items-center gap-1.5 sm:hover:bg-cancel-btn-hover sm:active:bg-cancel-btn-active rounded-md transition-colors",
