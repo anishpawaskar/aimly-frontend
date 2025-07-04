@@ -4,5 +4,7 @@ export const useTasksSidenavData = (item) => {
   return useQuery({
     queryKey: [item.queryKey],
     queryFn: item.queryFn,
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
   });
 };

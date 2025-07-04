@@ -5,10 +5,12 @@ import { SIDE_NAV_DATA } from "./sidenav.contant";
 import { cn } from "@/lib/utils";
 import { IconButton } from "../primitive/icon-button";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../primitive/tooltip";
+import { useAppSettings } from "@/context/app-settings-provider";
 
 const SidenavDesktop = () => {
   const { theme } = useTheme();
   const isLight = theme === "light";
+  const { userSettings } = useAppSettings();
 
   return (
     <div
@@ -39,6 +41,15 @@ const SidenavDesktop = () => {
 
         {SIDE_NAV_DATA.map((sidenav) => {
           const IconComponent = sidenav.icon;
+          let href;
+
+          if (sidenav.label === "Tasks") {
+            href = `/projects/${
+              userSettings?.defaultProjectId ?? "inbox"
+            }/tasks`;
+          } else {
+            href = sidenav.href;
+          }
 
           return (
             <li
@@ -48,7 +59,7 @@ const SidenavDesktop = () => {
               <Tooltip>
                 <TooltipTrigger asChild>
                   <NavLink
-                    to={sidenav.href}
+                    to={href}
                     className="w-full h-full flex items-center justify-center"
                   >
                     {({ isActive }) => (

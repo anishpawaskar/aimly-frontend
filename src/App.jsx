@@ -7,6 +7,7 @@ import DashboardLayout from "./pages/dashboard/layout";
 import TasksLayout from "./pages/tasks/layout";
 import { ProtectedRoute } from "./components/protected-route";
 import { PublicProtectedRoute } from "./components/public-protected-route";
+import { AppSettingsProvider } from "./context/app-settings-provider";
 
 function App() {
   return (
@@ -44,7 +45,9 @@ function App() {
         <Route
           element={
             <ProtectedRoute>
-              <DashboardLayout />
+              <AppSettingsProvider>
+                <DashboardLayout />
+              </AppSettingsProvider>
             </ProtectedRoute>
           }
         >

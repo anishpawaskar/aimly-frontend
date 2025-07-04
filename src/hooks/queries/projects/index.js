@@ -6,5 +6,6 @@ export const useGetProjects = () => {
     queryKey: ["projects"],
     queryFn: getProjects,
     refetchOnWindowFocus: false,
+    refetchOnMount: false,
   });
 };

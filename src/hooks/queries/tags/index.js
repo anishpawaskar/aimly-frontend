@@ -6,5 +6,6 @@ export const useGetTags = () => {
     queryKey: ["tags"],
     queryFn: getTags,
     refetchOnWindowFocus: false,
+    refetchOnMount: false,
   });
 };
